@@ -1,9 +1,13 @@
 import Vue from 'vue';
+import SetariaUI from 'setaria-ui';
 import App from './App.vue';
 import router from './router';
 import store from './store';
+import 'setaria-ui/lib/theme-chalk/index.css';
 
 Vue.config.productionTip = false;
+
+Vue.use(SetariaUI);
 
 new Vue({
   router,
