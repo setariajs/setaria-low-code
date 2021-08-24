@@ -6,9 +6,8 @@
 module.exports = {
   devServer: {
     port: 8088,
-    https: false,
-    proxy: {
-    },
+    // proxy: {
+    // },
   },
   // chainWebpack(config) {
   // // set svg-sprite-loader
