@@ -1,14 +1,14 @@
 <template>
   <div class="rootContainer">
-    <left-side />
-    <main-content />
+    <left-side @add="addComponent" />
+    <main-content :drawingList="drawingList" />
     <right-side />
   </div>
 </template>
 <script>
-import LeftSide from '@/components/LeftSide.vue';
-import RightSide from '@/components/RightSide.vue';
-import MainContent from '@/components/MainContent.vue';
+import LeftSide from '@/components/LeftSide/index.vue';
+import RightSide from '@/components/RightSide/index.vue';
+import MainContent from '@/components/MainContent/index.vue';
 
 export default {
   components: {
@@ -17,10 +17,18 @@ export default {
     MainContent,
   },
   data() {
-    return {};
+    return {
+      drawingList: [],
+    };
   },
   mounted() {},
-  methods: {},
+  methods: {
+    addComponent(item) {
+      this.drawingList.push(item);
+    },
+
+
+  },
 };
 </script>
 <style lang="scss" scoped>
