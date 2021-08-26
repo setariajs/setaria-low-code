@@ -8,18 +8,20 @@
         name="form" />
     </el-tabs>
     <el-scrollbar>
+       <component-props v-show="tabeActive ==='components'" v-model="activeComponent"/>
       <form-props v-show="tabeActive ==='form'"
         v-model="formProps" />
-      <div v-show="tabeActive ==='components'">components</div>
+
     </el-scrollbar>
   </div>
 </template>
 
 <script>
 import FormProps from './FormProps.vue';
+import ComponentProps from './ComponentProps.vue';
 
 export default {
-  components: { FormProps },
+  components: { FormProps, ComponentProps },
   props: {
     activeComponent: {
       type: Object,

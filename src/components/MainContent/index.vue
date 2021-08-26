@@ -189,7 +189,7 @@ export default {
     color: #ccb1ea;
     letter-spacing: 4px;
   }
-  .el-col:hover {
+  /deep/ .el-col:hover {
     background: #fcf3ff;
   }
 }

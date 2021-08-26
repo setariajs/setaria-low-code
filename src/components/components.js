@@ -12,12 +12,14 @@ export default [
     },
     uiSchema: {
       'ui:disabled': undefined,
-      'ui:readonly': undefined,
       'ui:hidden': undefined,
-      'ui:clearable': undefined,
-      'ui:show-word-limit': undefined,
-      'ui:placeholder': undefined,
       'ui:colspan': undefined,
+      'ui:options': {
+        'ui:readonly': undefined,
+        'ui:clearable': undefined,
+        'ui:show-word-limit': undefined,
+        'ui:placeholder': undefined,
+      },
     },
   },
   {
@@ -34,12 +36,15 @@ export default [
     uiSchema: {
       'ui:widget': 'password',
       'ui:disabled': undefined,
-      'ui:readonly': undefined,
-      'ui:clearable': undefined,
-      'ui:show-word-limit': undefined,
-      'ui:hidden': undefined,
-      'ui:placeholder': undefined,
       'ui:colspan': undefined,
+      'ui:hidden': undefined,
+      'ui:options': {
+        'ui:readonly': undefined,
+        'ui:clearable': undefined,
+        'ui:show-word-limit': undefined,
+        'ui:placeholder': undefined,
+      },
+
     },
   },
   {
@@ -56,14 +61,17 @@ export default [
     uiSchema: {
       'ui:widget': 'textarea',
       'ui:disabled': undefined,
-      'ui:autosize': undefined,
-      'ui:rows': 2,
-      'ui:readonly': undefined,
-      'ui:clearable': undefined,
-      'ui:show-word-limit': undefined,
       'ui:hidden': undefined,
-      'ui:placeholder': undefined,
       'ui:colspan': undefined,
+      'ui:options': {
+        'ui:autosize': undefined,
+        'ui:rows': 2,
+        'ui:readonly': undefined,
+        'ui:clearable': undefined,
+        'ui:show-word-limit': undefined,
+        'ui:placeholder': undefined,
+      },
+
     },
   },
 ];
