@@ -1,16 +1,18 @@
 <template>
 
-  <el-scrollbar class="mainContentContainer">
+  <el-scrollbar :vertical="true" class="mainContentContainer">
     <!-- draggable=".el-form-item" -->
-    <!-- draggable=".el-col"
+    <!--
       handle=".el-form-item__label-wrap"
        tag="el-json-form"
       :component-data="draggableComponentData" -->
     <draggable class="drawingBoard"
+      draggable=".el-row .el-col"
       :list="drawingList"
       :animation="340"
       group="componentsGroup">
       <el-json-form ref="form"
+        v-bind="formProps"
         :model="formModel"
         :schema="formSchema"
         :ui-schema="formUiSchema"
@@ -50,6 +52,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    formProps: {
+      type: Object,
+      default: () => {},
+    },
   },
   data() {
     return {
@@ -59,6 +65,11 @@ export default {
       rules: {},
       // drawingList: [],
     };
+  },
+  mounted() {
+    document
+      .querySelector('.drawingBoard')
+      .addEventListener('click', this.findComponent);
   },
   watch: {
     drawingList: {
@@ -121,13 +132,14 @@ export default {
       const uiSchema = {};
       const model = {};
       this.drawingList.forEach((item) => {
+        const { key } = item;
         if (item.required) {
-          required.push(item.key);
+          required.push(key);
         }
-        properties[item.key] = item.schema;
-        uiSchema[item.key] = item.uiSchema;
+        properties[key] = this.formSchema[key] || item.schema;
+        uiSchema[key] = this.formUiSchema[key] || item.uiSchema;
         // TODO 需要判断类型
-        model[item.key] = '';
+        model[key] = this.formModel[key] || '';
       });
 
       this.formModel = model;
@@ -136,6 +148,25 @@ export default {
         properties,
       };
       this.formUiSchema = uiSchema;
+    },
+    findComponent(event) {
+      let key = '';
+      if (event.target.nodeName.toLowerCase() === 'label') {
+        key = event.target.getAttribute('for');
+      } else if (
+        Array.from(event.target.classList).includes('el-col')
+        || Array.from(event.target.classList).includes('el--form-item')
+      ) {
+        key = event.target.querySelector('label').getAttribute('for');
+      }
+      if (key) {
+        const findObj = this.drawingList.find(item => item.key === key);
+        this.setActiveComponent(findObj);
+      }
+    },
+    setActiveComponent(item) {
+      this.$emit('setActiveComponent', item);
+      // this.setActiveComponent = item;
     },
   },
 };
@@ -157,6 +188,9 @@ export default {
     font-size: 18px;
     color: #ccb1ea;
     letter-spacing: 4px;
+  }
+  .el-col:hover {
+    background: #fcf3ff;
   }
 }
 </style>

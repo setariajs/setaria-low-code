@@ -1,8 +1,11 @@
 <template>
   <div class="rootContainer">
     <left-side @add="addComponent" />
-    <main-content :drawingList="drawingList" />
-    <right-side />
+    <main-content :drawingList="drawingList"
+      :formProps="formProps"
+      @setActiveComponent="setActiveComponent" />
+    <right-side :formProps="formProps"
+      :activeComponent="activeComponent" />
   </div>
 </template>
 <script>
@@ -19,6 +22,19 @@ export default {
   data() {
     return {
       drawingList: [],
+      activeComponent: {},
+      formProps: {
+        inline: false,
+        disabled: false,
+        'label-position': '',
+        'label-width': '100px',
+        'label-suffix': ':',
+        size: '',
+        columns: undefined,
+        'validate-on-rule-change': true,
+        'column-max-label-length': undefined,
+        'show-message': true,
+      },
     };
   },
   mounted() {},
@@ -26,8 +42,9 @@ export default {
     addComponent(item) {
       this.drawingList.push(item);
     },
-
-
+    setActiveComponent(item) {
+      this.activeComponent = item;
+    },
   },
 };
 </script>

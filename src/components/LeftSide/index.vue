@@ -33,7 +33,7 @@ export default {
 .leftSideContainer {
   height: 100%;
   border-right: 1px solid #e3e3e3;
-  width: 300px;
+  width: 270px;
   padding: 10px;
 }
 </style>
