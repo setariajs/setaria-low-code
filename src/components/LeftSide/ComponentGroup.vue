@@ -64,7 +64,7 @@ export default {
     },
     cloneComponent(origin) {
       const clone = cloneDeep(origin);
-      this.idGlobal += 1;
+      this.idGlobal = getIdGlobal() + 1;
       clone.key = `field${this.idGlobal}`;
       return clone;
     },
@@ -87,6 +87,7 @@ export default {
 
 <style scoped lang="scss">
 .groupContainer {
+  margin-bottom: 20px;
   .title {
     font-size: 16px;
   }

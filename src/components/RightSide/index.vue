@@ -43,10 +43,10 @@ export default {
 <style scoped lang="scss">
 .rightSideContainer {
   border-left: 1px solid #e3e3e3;
-  width: 300px;
-  height: 100%;
+  width: 350px;
+  height: calc(100% - 60px);
   .el-scrollbar {
-    height: calc(100% - 40px);
+    height: 100%;
   }
   // /deep/ {
   //   .el-tabs,

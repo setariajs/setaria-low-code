@@ -1,30 +1,34 @@
 <template>
   <div class="leftSideContainer">
-   <el-scrollbar >
-     <!--  -->
-      <component-group  @add="addComponent" :title="'输入型组件'"  :components="inputComponent"/>
+    <el-scrollbar>
+      <!--  -->
+      <component-group @add="addComponent"
+        :title="'输入型组件'"
+        :components="inputComponents" />
+      <component-group @add="addComponent"
+        :title="'选择型组件'"
+        :components="selectComponents" />
     </el-scrollbar>
-
 
   </div>
 </template>
 
 <script>
-import InputComponent from '../components';
+import { inputComponents, selectComponents } from '../components';
 import ComponentGroup from './ComponentGroup.vue';
 
 export default {
   components: { ComponentGroup },
   data() {
     return {
-      inputComponent: InputComponent,
+      inputComponents,
+      selectComponents,
     };
   },
   methods: {
     addComponent(item) {
       this.$emit('add', item);
     },
-
   },
 };
 </script>

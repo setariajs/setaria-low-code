@@ -1,5 +1,5 @@
 <template>
-   <div class="componentPropsContainer">
+  <div class="componentPropsContainer">
     <el-json-form ref="form"
       :size="'mini'"
       :label-position="'right'"
@@ -11,11 +11,14 @@
       :validate-on-rule-change="false"
       :columns="1"
       @change="handlerChange" />
+      <option-props v-model="list"></option-props>
   </div>
 </template>
 
 <script>
 import get from 'lodash/get';
+import { propsMapping } from '@/components/components';
+import OptionProps from './OptionProps.vue';
 // import findKey from 'lodash/findKey';
 
 // const oneOfTureFalse = [
@@ -23,6 +26,7 @@ import get from 'lodash/get';
 //   { const: true, title: '是' },
 // ];
 export default {
+  components: { OptionProps },
   props: {
     value: {
       type: Object,
@@ -35,97 +39,81 @@ export default {
       uiSchema: {},
       innerValue: {},
       subComponentType: '',
+      componentName: '',
+      list: [{
+        value: '1',
+        label: '选项1',
+      }, {
+        value: '2',
+        label: '选项2',
+      }],
     };
   },
-  computed: {
-    // innerValue: {
-    //   get() {
-    //     return this.value;
-    //   },
-    //   set(val) {
-    //     this.$emit('input', val);
-    //   },
-    // },
-  },
+  computed: {},
   watch: {
     value: {
       deep: true,
       handler() {
-        this.initParams();
+        this.initComponent();
       },
     },
   },
   methods: {
-    initParams() {
-      const { componentName } = this.value;
-      if (componentName === 'input') {
-        this.initInputComponent();
-      }
-    },
-    initInputComponent() {
+    initComponent() {
+      this.componentName = this.value.componentName;
       this.subComponentType = get(this.value, 'uiSchema.ui:widget', 'input');
-
-
-      const properties = {
-        key: {
-          type: 'string',
-          title: '字段名',
-        },
-        title: {
-          type: 'string',
-          title: '标题',
-        },
-        description: {
-          type: 'string',
-          title: '标题补充描述',
-        },
-        // required: {
-        //   type: 'boolean',
-        //   title: '是否必填',
-        //   oneOf: oneOfTureFalse,
-        // },
-      };
-
-      const innerValue = Object.assign({}, this.value, this.value.schema, this.value.uiSchema);
+      // 转换值为平层值
+      const innerValue = Object.assign(
+        {},
+        this.value,
+        this.value.schema,
+        this.value.uiSchema,
+        this.value.uiSchema['ui:options'],
+      );
+      // 删除无用参数
       delete innerValue.schema;
       delete innerValue.uiSchema;
+      delete innerValue['ui:options'];
+
+      const properties = {};
+      const uiSchema = {};
+      // 获取propsMapping 直接对接jsonform格式
+      Object.keys(innerValue).forEach((key) => {
+        if (propsMapping.properties[key]) {
+          properties[key] = propsMapping.properties[key];
+        }
+        if (propsMapping.uiSchema[key]) {
+          uiSchema[key] = propsMapping.uiSchema[key];
+        }
+      });
+
       this.innerValue = innerValue;
-      //   const uiSchema = {
-      //     required: {
-      //       'ui:widget': 'select',
-      //       'ui:options': {
-      //         clearable: true,
-      //       },
-      //     },
-      //   };
+
       this.schema = {
         properties,
       };
-
-
-    //   console.log(componentType);
+      this.uiSchema = uiSchema;
     },
     handlerChange(sourceKey, newValue) {
-      //   console.log(this.loopFindKey(this.value, 'key'));
-      //   console.log(this.loopFindKey(this.value, 'description'));
-      //   console.log(this.loopFindKey(this.value, 'ui:disabled'));
-      //   console.log(this.loopFindKey(this.value, 'ui:readonly'));
       const keys = this.loopFindKey(this.value, sourceKey);
+      // 弹出对应的sourceKey位置内容
       keys.pop();
+      // 获取sourceKey上一层对象，并准备赋值
       const model = get(this.value, keys.join('.'), this.value);
       model[sourceKey] = newValue;
     },
+    // 轮询获取对应的可以位置
     loopFindKey(loopModel, sourceKey) {
-      const res = [];
+      let res = [];
 
       /* eslint-disable */
       for (const key in loopModel) {
-        if (typeof loopModel[key] === 'object') {
+        if (typeof loopModel[key] === "object") {
           const subRes = this.loopFindKey(loopModel[key], sourceKey);
 
           if (subRes.length !== 0) {
             res.push(key);
-            res.push(subRes[0]);
+            res = res.concat(subRes);
             break;
           }
         }
@@ -137,14 +125,15 @@ export default {
       }
       /* eslint-enable */
       return res;
-    //   Object.keys(loopModel).forEach(key => key === sourceKey);
-    //   return loopModel[resKey];
     },
   },
-
 };
 </script>
 
 <style scoped lang="scss">
-
+.componentPropsContainer {
+  padding: 0 10px;
+  height: 100%;
+  box-sizing: content-box;
+}
 </style>

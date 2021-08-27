@@ -151,11 +151,16 @@ export default {
     },
     findComponent(event) {
       let key = '';
-      if (event.target.nodeName.toLowerCase() === 'label') {
-        key = event.target.getAttribute('for');
+
+      const labelNode = event.path.find(item => (item.className ? item.className.includes('el-form-item__label') : false));
+      // if (event.target.nodeName.toLowerCase() === 'label') {
+      //   key = event.target.getAttribute('for');
+      // } else
+      if (labelNode) {
+        key = labelNode.getAttribute('for');
       } else if (
         Array.from(event.target.classList).includes('el-col')
-        || Array.from(event.target.classList).includes('el--form-item')
+        || Array.from(event.target.classList).includes('el-form-item')
       ) {
         key = event.target.querySelector('label').getAttribute('for');
       }
