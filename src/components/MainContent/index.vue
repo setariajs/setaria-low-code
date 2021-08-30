@@ -1,6 +1,7 @@
 <template>
 
-  <el-scrollbar :vertical="true" class="mainContentContainer">
+  <el-scrollbar :vertical="true"
+    class="mainContentContainer">
     <!-- draggable=".el-form-item" -->
     <!--
       handle=".el-form-item__label-wrap"
@@ -19,18 +20,6 @@
         :rules="rules">
       </el-json-form>
 
-      <!-- <draggable-item
-                v-for="(item, index) in drawingList"
-                :key="item.renderKey"
-                :drawing-list="drawingList"
-                :current-item="item"
-                :index="index"
-                :active-id="activeId"
-                :form-conf="formConf"
-                @activeItem="activeFormItem"
-                @copyItem="drawingItemCopy"
-                @deleteItem="drawingItemDelete"
-              /> -->
     </draggable>
     <div class="el-col"
       v-for="(item,index) in drawingList"
@@ -44,6 +33,11 @@
 
 <script>
 import draggable from 'vuedraggable';
+
+
+function hasClass(target, key) {
+  return Array.from(target.classList).includes(key);
+}
 // TODO 增加顶部相关按钮
 export default {
   components: { draggable },
@@ -69,7 +63,10 @@ export default {
   mounted() {
     document
       .querySelector('.drawingBoard')
-      .addEventListener('click', this.findComponent);
+      .addEventListener('click', (e) => {
+        this.bindFindComponent(e);
+        this.bindRomoveComponent(e);
+      });
   },
   watch: {
     drawingList: {
@@ -93,29 +90,36 @@ export default {
   },
   methods: {
     initFormModel() {
+      console.log('drawingList change');
       const required = [];
       const properties = {};
       const uiSchema = {};
       const model = {};
       this.drawingList.forEach((item) => {
         const { key } = item;
-        if (item.required) {
-          required.push(key);
-        }
-        properties[key] = this.formSchema[key] || item.schema;
-        uiSchema[key] = this.formUiSchema[key] || item.uiSchema;
-        // 处理 uiSchema.ui:options 类型赋值问题
+        // debugger;
+        // console.log(item.length);
+        if (!item.isDeleted) {
+          if (item.required) {
+            required.push(key);
+          }
+          properties[key] = this.formSchema[key] || item.schema;
+          uiSchema[key] = this.formUiSchema[key] || item.uiSchema;
+          // 处理 uiSchema.ui:options 类型赋值问题
 
-        this.processUiSchemaKey(uiSchema[key]['ui:options']);
+          this.processUiSchemaKey(uiSchema[key]['ui:options']);
 
-        // uiSchema[key]['ui:options'].type = 'month';
+          // uiSchema[key]['ui:options'].type = 'month';
 
-
-        // TODO 需要判断类型
-        if (properties[key].type === 'array') {
-          model[key] = this.formModel[key] || [];
+          // TODO 需要判断类型
+          if (properties[key].type === 'array') {
+            model[key] = this.formModel[key] || [];
+          } else {
+            model[key] = this.formModel[key] || '';
+          }
         } else {
-          model[key] = this.formModel[key] || '';
+          properties[key] = {};
+          uiSchema[key] = {};
         }
       });
 
@@ -125,6 +129,9 @@ export default {
         properties,
       };
       this.formUiSchema = uiSchema;
+      this.$nextTick(() => {
+        this.appendOperBtn();
+      });
     },
     // 处理 uiSchema.ui:options 类型赋值问题
     processUiSchemaKey(uiOptions) {
@@ -135,7 +142,18 @@ export default {
         }
       });
     },
-    findComponent(event) {
+    // 添加各种处理按钮
+    appendOperBtn() {
+      Array.from(
+        document.querySelectorAll('.drawingBoard .el-col'),
+      ).forEach((dom, index) => {
+        if (!dom.innerHTML.includes('deleteOper')) {
+          dom.innerHTML += '<i class="el-icon-delete deleteOper"><i>';
+        }
+        dom.querySelector('label').setAttribute('data-key', this.drawingList[index].key);
+      });
+    },
+    bindFindComponent(event) {
       let key = '';
       // TODO 增加选中样式
       const labelNode = event.path.find(item => (item.className ? item.className.includes('el-form-item__label') : false));
@@ -143,22 +161,59 @@ export default {
       //   key = event.target.getAttribute('for');
       // } else
       if (labelNode) {
-        key = labelNode.getAttribute('for');
+        key = labelNode.getAttribute('data-key');
       } else if (
-        Array.from(event.target.classList).includes('el-col')
-        || Array.from(event.target.classList).includes('el-form-item')
+        hasClass(event.target, 'el-col')
+        || hasClass(event.target, 'el-form-item')
       ) {
-        key = event.target.querySelector('label').getAttribute('for');
+        key = event.target.querySelector('label').getAttribute('data-key');
       }
       if (key) {
         const findObj = this.drawingList.find(item => item.key === key);
-        this.setActiveComponent(findObj);
+        if (findObj) {
+          this.setActiveComponent(findObj);
+          this.setActiveComponentClass(findObj);
+        }
       }
+    },
+    bindRomoveComponent(event) {
+      if (hasClass(event.target, 'deleteOper')) {
+        const key = event.target.parentElement.querySelector('label').getAttribute('data-key');
+        this.removeComponentByKey(key);
+      }
+    },
+    setActiveComponentClass(selectItem) {
+      const findObj = Array.from(
+        document.querySelectorAll('.drawingBoard .el-col'),
+      ).find(item => item.querySelector(`label[data-key="${selectItem.key}"]`));
+      const alreadyItem = document.querySelector(
+        '.drawingBoard .el-col.selected',
+      );
+      if (alreadyItem) {
+        alreadyItem.classList.remove('selected');
+      }
+      findObj.classList.add('selected');
     },
     setActiveComponent(item) {
       this.$emit('setActiveComponent', item);
-      // this.setActiveComponent = item;
     },
+    removeComponentByKey(key) {
+      console.log(key);
+      const index = this.drawingList.findIndex(item => item.key === key);
+      if (index !== -1) {
+        // TODO 删除有问题，需要修改jsonForm组件
+        this.drawingList[index].isDeleted = true; // .splice(index, 1);
+        this.initFormModel();
+        // this.$emit('removeComponent');
+
+      //   this.drawingList = JSON.parse(JSON.stringify(this.drawingList));
+        // console.log('removeComponentByKey');
+        // this.$refs.form.$forceUpdate();
+        // this.drawingList = this.drawingList;
+      }
+      // this.$emit('setActiveComponent', item);
+    },
+
   },
 };
 </script>
@@ -180,8 +235,38 @@ export default {
     color: #ccb1ea;
     letter-spacing: 4px;
   }
-  /deep/ .el-col:hover {
-    background: #fcf3ff;
+  /deep/ .el-col {
+    position: relative;
+    .deleteOper {
+      content: "\E6D7";
+      display: none;
+      font-family: element-icons !important;
+      border-radius: 50%;
+      border: 1px solid #f44336;
+      color: #f44336;
+      font-size: 12px;
+      width: 16px;
+      height: 16px;
+      text-align: center;
+      line-height: 15px;
+      padding-left: 1px;
+      cursor: pointer;
+      position: absolute;
+      bottom: 0;
+      right: 5px;
+    }
+    &:hover {
+      background: #fcf3ff;
+      .deleteOper  {
+        display: block;
+      }
+    }
+    &.selected {
+      background: #fcf3ff;
+      .deleteOper  {
+        display: block;
+      }
+    }
   }
 }
 </style>

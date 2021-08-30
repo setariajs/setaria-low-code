@@ -370,6 +370,37 @@ export const selectComponents = [
       },
     },
   },
+  {
+    componentName: 'searchHelp',
+    required: false,
+    key: undefined,
+    schema: {
+      description: undefined,
+      type: 'string',
+      title: '搜索帮助',
+    },
+    uiSchema: {
+      'ui:disabled': undefined,
+      'ui:hidden': undefined,
+      'ui:colspan': undefined,
+      'ui:options': {
+        'suffix-icon': 'el-icon-search',
+        readonly: true,
+        clearable: undefined,
+      },
+      'ui:nativeOn': {
+        click: () => {
+          this.$message.info('searchHelp click');
+        },
+      },
+      // 'ui:nativeOn': {
+      //   click: () => {
+      //     alert('test');
+      //     this.$message.info('searchHelp click');
+      //   },
+      // },
+    },
+  },
 ];
 
 export default {

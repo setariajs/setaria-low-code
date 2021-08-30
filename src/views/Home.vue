@@ -1,7 +1,8 @@
 <template>
   <div class="rootContainer">
     <left-side @add="addComponent" />
-    <main-content :drawingList="drawingList"
+    <main-content  :drawingList="drawingList"
+    ref="mainCotent"
       :formProps="formProps"
       @setActiveComponent="setActiveComponent" />
     <right-side :formProps="formProps"
@@ -31,7 +32,7 @@ export default {
         'label-suffix': ':',
         size: '',
         columns: undefined,
-        'validate-on-rule-change': true,
+        'validate-on-rule-change': undefined,
         'column-max-label-length': undefined,
         'show-message': true,
       },
@@ -41,6 +42,10 @@ export default {
   methods: {
     addComponent(item) {
       this.drawingList.push(item);
+      this.setActiveComponent(item);
+      setTimeout(() => {
+        this.$refs.mainCotent.setActiveComponentClass(item);
+      }, 200);
     },
     setActiveComponent(item) {
       // TODO 默认添加时设置激活组件
