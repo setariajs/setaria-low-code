@@ -44,7 +44,7 @@
 
 <script>
 import draggable from 'vuedraggable';
-
+// TODO 增加顶部相关按钮
 export default {
   components: { draggable },
   props: {
@@ -88,42 +88,8 @@ export default {
           'ui-schema': this.formUiSchema,
           rules: this.rules,
         },
-        // :model="this.formModel"
-        //       :schema="formSchema"
-        //       :ui-schema="formUiSchema"
-        //       :rules="rules"
       };
     },
-    // formSchema() {
-    //   // required: ['firstName', 'lastName', 'age', 'comment'],
-    //   // properties: {
-    //   //   firstName: {
-    //   //     description: 'First Name(名)First Name(名)First Name(名)First Name(名)First Name(名)First Name(名)First Name(名)First Name(名)First Name(名)First Name(名)First Name(名)First Name(名)',
-    //   //     type: 'string',
-    //   //     title: 'First name',
-    //   //     minLength: 3,
-    //   //     maxLength: 6,
-    //   //   },
-    //   // }
-    //   //  uiSchema: {}
-    //   return {
-    //     required,
-    //     properties,
-    //   };
-    // },
-    // formUiSchema() {
-    //   const required = [];
-    //   const properties = {};
-    //   const uiSchema = {};
-    //   this.drawingList.forEach((item) => {
-    //     if (item.required) {
-    //       required.push(item.key);
-    //     }
-    //     properties[item.key] = item.schema;
-    //     uiSchema[item.key] = item.uiSchema;
-    //   });
-    //   return uiSchema;
-    // },
   },
   methods: {
     initFormModel() {
@@ -138,8 +104,19 @@ export default {
         }
         properties[key] = this.formSchema[key] || item.schema;
         uiSchema[key] = this.formUiSchema[key] || item.uiSchema;
+        // 处理 uiSchema.ui:options 类型赋值问题
+
+        this.processUiSchemaKey(uiSchema[key]['ui:options']);
+
+        // uiSchema[key]['ui:options'].type = 'month';
+
+
         // TODO 需要判断类型
-        model[key] = this.formModel[key] || '';
+        if (properties[key].type === 'array') {
+          model[key] = this.formModel[key] || [];
+        } else {
+          model[key] = this.formModel[key] || '';
+        }
       });
 
       this.formModel = model;
@@ -149,9 +126,18 @@ export default {
       };
       this.formUiSchema = uiSchema;
     },
+    // 处理 uiSchema.ui:options 类型赋值问题
+    processUiSchemaKey(uiOptions) {
+      Object.keys(uiOptions).forEach((key) => {
+        if (key.includes('uiSchema.ui:options.')) {
+          const targetKey = key.split('.').pop();
+          uiOptions[targetKey] = uiOptions[key];
+        }
+      });
+    },
     findComponent(event) {
       let key = '';
-
+      // TODO 增加选中样式
       const labelNode = event.path.find(item => (item.className ? item.className.includes('el-form-item__label') : false));
       // if (event.target.nodeName.toLowerCase() === 'label') {
       //   key = event.target.getAttribute('for');

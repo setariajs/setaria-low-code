@@ -43,6 +43,7 @@ export default {
       this.drawingList.push(item);
     },
     setActiveComponent(item) {
+      // TODO 默认添加时设置激活组件
       this.activeComponent = item;
     },
   },

@@ -8,7 +8,7 @@ const commonUiSchemaSelect = {
     clearable: true,
   },
 };
-
+// 通用的属性映射
 export const propsMapping = {
   properties: {
     required: {
@@ -69,9 +69,19 @@ export const propsMapping = {
       title: '是否显示字数统计',
       oneOf: oneOfTureFalse,
     },
+    multiple: {
+      type: 'string',
+      title: '是否可多选',
+      oneOf: oneOfTureFalse,
+    },
     clearable: {
       type: 'boolean',
       title: '是否可清空',
+      oneOf: oneOfTureFalse,
+    },
+    filterable: {
+      type: 'boolean',
+      title: '是否可搜索',
       oneOf: oneOfTureFalse,
     },
     'ui:disabled': {
@@ -94,7 +104,17 @@ export const propsMapping = {
       title: '是否显示切换密码',
       oneOf: oneOfTureFalse,
     },
-
+    'datePicker.uiSchema.ui:options.type': {
+      type: 'string',
+      title: '选取类型',
+      oneOf: [
+        { const: 'year', title: '年' },
+        { const: 'month', title: '月' },
+        { const: 'date', title: '日期' },
+        { const: 'dates', title: '多个日期' },
+        { const: 'week', title: '周' },
+      ],
+    },
 
   },
   uiSchema: {
@@ -109,15 +129,20 @@ export const propsMapping = {
     maxLength: {},
     'ui:autosize': commonUiSchemaSelect,
     'show-word-limit': commonUiSchemaSelect,
+    multiple: commonUiSchemaSelect,
+    filterable: commonUiSchemaSelect,
     clearable: commonUiSchemaSelect,
     'ui:disabled': commonUiSchemaSelect,
     readonly: commonUiSchemaSelect,
     'ui:hidden': commonUiSchemaSelect,
     'show-password': commonUiSchemaSelect,
     type: [],
+    'datePicker.uiSchema.ui:options.type': commonUiSchemaSelect,
   },
 
 };
+
+// 输入型组件属性
 export const inputComponents = [
   {
     componentName: 'input',
@@ -132,6 +157,7 @@ export const inputComponents = [
     },
     uiSchema: {
       'ui:placeholder': undefined,
+      'ui:rules': [],
       'ui:disabled': undefined,
       'ui:hidden': undefined,
       'ui:colspan': undefined,
@@ -155,6 +181,7 @@ export const inputComponents = [
     },
     uiSchema: {
       'ui:widget': 'password',
+      'ui:rules': [],
       'ui:placeholder': undefined,
       'ui:disabled': undefined,
       'ui:colspan': undefined,
@@ -181,6 +208,7 @@ export const inputComponents = [
     },
     uiSchema: {
       'ui:widget': 'textarea',
+      'ui:rules': [],
       'ui:placeholder': undefined,
       'ui:disabled': undefined,
       'ui:hidden': undefined,
@@ -191,13 +219,12 @@ export const inputComponents = [
         readonly: undefined,
         clearable: undefined,
         'show-word-limit': undefined,
-
       },
 
     },
   },
 ];
-
+// 选择性组件属性
 export const selectComponents = [
   {
     componentName: 'select',
@@ -207,9 +234,16 @@ export const selectComponents = [
       description: undefined,
       type: 'string',
       title: '下拉选择',
-      oneOf: [],
+      oneOf: [{
+        const: '1',
+        title: '选项1',
+      }, {
+        const: '2',
+        title: '选项2',
+      }],
     },
     uiSchema: {
+      'ui:widget': 'select',
       'ui:placeholder': undefined,
       'ui:disabled': undefined,
       'ui:hidden': undefined,
@@ -217,7 +251,122 @@ export const selectComponents = [
       'ui:options': {
         readonly: undefined,
         clearable: undefined,
-        // multiple
+        multiple: undefined,
+        filterable: undefined,
+      },
+    },
+  },
+  {
+    componentName: 'radio',
+    required: false,
+    key: undefined,
+    schema: {
+      description: undefined,
+      type: 'string',
+      title: '单选框组',
+      oneOf: [{
+        const: '1',
+        title: '选项1',
+      }, {
+        const: '2',
+        title: '选项2',
+      }],
+    },
+    uiSchema: {
+      'ui:widget': 'radio',
+      'ui:disabled': undefined,
+      'ui:hidden': undefined,
+      'ui:colspan': undefined,
+      'ui:options': {
+        readonly: undefined,
+      },
+    },
+  },
+  {
+    componentName: 'checkbox',
+    required: false,
+    key: undefined,
+    schema: {
+      description: undefined,
+      type: 'array',
+      title: '多选框组',
+      anyOf: [{
+        const: '1',
+        title: '选项1',
+      }, {
+        const: '2',
+        title: '选项2',
+      }],
+    },
+    uiSchema: {
+      'ui:widget': 'checkbox',
+      'ui:disabled': undefined,
+      'ui:hidden': undefined,
+      'ui:colspan': undefined,
+      'ui:options': {
+        readonly: undefined,
+      },
+    },
+  },
+  {
+    componentName: 'datePicker',
+    required: false,
+    key: undefined,
+    schema: {
+      description: undefined,
+      type: 'string',
+      title: '日期选择',
+      format: 'date',
+    },
+    uiSchema: {
+      'ui:disabled': undefined,
+      'ui:hidden': undefined,
+      'ui:colspan': undefined,
+      'ui:options': {
+        readonly: undefined,
+        clearable: undefined,
+        // type: undefined,
+        'datePicker.uiSchema.ui:options.type': undefined,
+      },
+    },
+  },
+  {
+    componentName: 'dateTimePicker',
+    required: false,
+    key: undefined,
+    schema: {
+      description: undefined,
+      type: 'string',
+      title: '日期时间选择',
+      format: 'date-time',
+    },
+    uiSchema: {
+      'ui:disabled': undefined,
+      'ui:hidden': undefined,
+      'ui:colspan': undefined,
+      'ui:options': {
+        readonly: undefined,
+        clearable: undefined,
+      },
+    },
+  },
+  {
+    componentName: 'timePicker',
+    required: false,
+    key: undefined,
+    schema: {
+      description: undefined,
+      type: 'string',
+      title: '时间选择',
+      format: 'time',
+    },
+    uiSchema: {
+      'ui:disabled': undefined,
+      'ui:hidden': undefined,
+      'ui:colspan': undefined,
+      'ui:options': {
+        readonly: undefined,
+        clearable: undefined,
       },
     },
   },

@@ -11,12 +11,12 @@
         <div class="optionIcon optionDrag">
           <i class="el-icon-s-operation" />
         </div>
-        <el-input v-model="item.label"
+        <el-input v-model="item.title"
           placeholder="选项名"
           size="small" />
         <el-input placeholder="选项值"
           size="small"
-          :value="item.value"
+          :value="item.const"
           @input="setOptionValue(item, $event)" />
         <div class="closeBtn optionIcon"
           @click="value.splice(index, 1)">
@@ -38,14 +38,7 @@
 <script>
 import draggable from 'vuedraggable';
 import isNumber from 'lodash/isNumber';
-// import get from 'lodash/get';
-// import { propsMapping } from '@/components/components';
-// import findKey from 'lodash/findKey';
 
-// const oneOfTureFalse = [
-//   { const: false, title: '否' },
-//   { const: true, title: '是' },
-// ];
 export default {
   components: { draggable },
   props: {
@@ -56,100 +49,22 @@ export default {
   },
   data() {
     return {
-      // schema: {},
-      // uiSchema: {},
-      // innerValue: {},
-      // subComponentType: '',
-      // componentName: '',
     };
   },
   computed: {},
   watch: {
-    // value: {
-    //   deep: true,
-    //   handler() {
-    //     this.initComponent();
-    //   },
-    // },
   },
   methods: {
     setOptionValue(item, val) {
-      item.value = isNumber(val) ? +val : val;
+      item.const = isNumber(val) ? +val : val;
     },
     addOption() {
       this.value.push({
-        label: '',
-        value: '',
+        title: '',
+        const: '',
       });
     },
 
-    // initComponent() {
-    //   this.componentName = this.value.componentName;
-    //   this.subComponentType = get(this.value, 'uiSchema.ui:widget', 'input');
-    //   // 转换值为平层值
-    //   const innerValue = Object.assign(
-    //     {},
-    //     this.value,
-    //     this.value.schema,
-    //     this.value.uiSchema,
-    //     this.value.uiSchema['ui:options'],
-    //   );
-    //   // 删除无用参数
-    //   delete innerValue.schema;
-    //   delete innerValue.uiSchema;
-    //   delete innerValue['ui:options'];
-
-    //   const properties = {};
-    //   const uiSchema = {};
-    //   // 获取propsMapping 直接对接jsonform格式
-    //   Object.keys(innerValue).forEach((key) => {
-    //     if (propsMapping.properties[key]) {
-    //       properties[key] = propsMapping.properties[key];
-    //     }
-    //     if (propsMapping.uiSchema[key]) {
-    //       uiSchema[key] = propsMapping.uiSchema[key];
-    //     }
-    //   });
-
-    //   this.innerValue = innerValue;
-
-    //   this.schema = {
-    //     properties,
-    //   };
-    //   this.uiSchema = uiSchema;
-    // },
-    // handlerChange(sourceKey, newValue) {
-    //   const keys = this.loopFindKey(this.value, sourceKey);
-    //   // 弹出对应的sourceKey位置内容
-    //   keys.pop();
-    //   // 获取sourceKey上一层对象，并准备赋值
-    //   const model = get(this.value, keys.join('.'), this.value);
-    //   model[sourceKey] = newValue;
-    // },
-    // // 轮询获取对应的可以位置
-    // loopFindKey(loopModel, sourceKey) {
-    //   let res = [];
-
-    //   /* eslint-disable */
-    //   for (const key in loopModel) {
-    //     if (typeof loopModel[key] === "object") {
-    //       const subRes = this.loopFindKey(loopModel[key], sourceKey);
-
-    //       if (subRes.length !== 0) {
-    //         res.push(key);
-    //         res = res.concat(subRes);
-    //         break;
-    //       }
-    //     }
-
-    //     if (key === sourceKey) {
-    //       res.push(key);
-    //       break;
-    //     }
-    //   }
-    //   /* eslint-enable */
-    //   return res;
-    // },
   },
 };
 </script>

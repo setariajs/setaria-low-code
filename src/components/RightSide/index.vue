@@ -8,7 +8,10 @@
         name="form" />
     </el-tabs>
     <el-scrollbar>
-       <component-props v-show="tabeActive ==='components'" v-model="activeComponent"/>
+
+      <component-props v-show="tabeActive ==='components'"
+        v-model="activeComponent" />
+
       <form-props v-show="tabeActive ==='form'"
         v-model="formProps" />
 

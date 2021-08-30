@@ -103,6 +103,8 @@ export default {
       cursor: move;
       border-radius: 3px;
       font-size: 14px;
+      width: 32%;
+      text-align: center;
       .componentsBody {
       }
       &:hover {

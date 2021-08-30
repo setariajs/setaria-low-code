@@ -11,7 +11,16 @@
       :validate-on-rule-change="false"
       :columns="1"
       @change="handlerChange" />
-      <option-props v-model="list"></option-props>
+
+    <!-- 单选选项配置 -->
+    <option-props v-model="value.schema.oneOf"
+      v-if="value.schema && value.schema.oneOf" />
+    <!-- 多选选项配置 -->
+    <option-props v-model="value.schema.anyOf"
+      v-if="value.schema && value.schema.anyOf" />
+    <!-- 正则校验配置 -->
+    <regular-props v-model="value.uiSchema['ui:rules']"
+      v-if="value.uiSchema && value.uiSchema['ui:rules']" />
   </div>
 </template>
 
@@ -19,14 +28,11 @@
 import get from 'lodash/get';
 import { propsMapping } from '@/components/components';
 import OptionProps from './OptionProps.vue';
-// import findKey from 'lodash/findKey';
+import RegularProps from './RegularProps.vue';
 
-// const oneOfTureFalse = [
-//   { const: false, title: '否' },
-//   { const: true, title: '是' },
-// ];
+
 export default {
-  components: { OptionProps },
+  components: { OptionProps, RegularProps },
   props: {
     value: {
       type: Object,
@@ -40,13 +46,7 @@ export default {
       innerValue: {},
       subComponentType: '',
       componentName: '',
-      list: [{
-        value: '1',
-        label: '选项1',
-      }, {
-        value: '2',
-        label: '选项2',
-      }],
+      list: [],
     };
   },
   computed: {},
@@ -68,7 +68,7 @@ export default {
         this.value,
         this.value.schema,
         this.value.uiSchema,
-        this.value.uiSchema['ui:options'],
+        this.processUiSchemaKey(this.value.uiSchema['ui:options']),
       );
       // 删除无用参数
       delete innerValue.schema;
@@ -93,6 +93,17 @@ export default {
         properties,
       };
       this.uiSchema = uiSchema;
+    },
+    // 暂时删除被冲突的key
+    processUiSchemaKey(uiOptions) {
+      Object.keys(uiOptions).forEach((key) => {
+        if (key.includes('uiSchema.ui:options.')) {
+          const targetKey = key.split('.').pop();
+          delete uiOptions[targetKey];
+          // uiOptions[targetKey] = uiOptions[key];
+        }
+      });
+      return uiOptions;
     },
     handlerChange(sourceKey, newValue) {
       const keys = this.loopFindKey(this.value, sourceKey);
