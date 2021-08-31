@@ -10,6 +10,8 @@
   "dependencies": {
     "clipboard": "^2.0.8",
     "core-js": "^2.6.5",
+    "file-saver": "^2.0.5",
+    "js-beautify": "^1.14.0",
     "lodash": "^4.17.21",
     "normalize.css": "^8.0.1",
     "setaria-ui": "^1.6.2",

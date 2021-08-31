@@ -1,7 +1,9 @@
 <template>
   <div class="leftSideContainer">
-    <el-scrollbar>
-      <!--  -->
+    <div class="topArea">
+      Setaria Low Code
+    </div>
+    <el-scrollbar class="scrollBar">
       <component-group @add="addComponent"
         :title="'输入型组件'"
         :components="inputComponents" />
@@ -38,6 +40,19 @@ export default {
   height: 100%;
   border-right: 1px solid #e3e3e3;
   width: 270px;
-  padding: 10px;
+  .topArea {
+    border-bottom: 1px solid #e3e3e3;
+    height: 40px;
+    line-height: 40px;
+    padding-left: 10px;
+    font-size: 18px;
+  }
+
+  .scrollBar {
+    height: calc(100% - 40px);
+    /deep/ .el-scrollbar__wrap {
+      overflow-x: hidden;
+    }
+  }
 }
 </style>

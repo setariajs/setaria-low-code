@@ -393,12 +393,6 @@ export const selectComponents = [
           this.$message.info('searchHelp click');
         },
       },
-      // 'ui:nativeOn': {
-      //   click: () => {
-      //     alert('test');
-      //     this.$message.info('searchHelp click');
-      //   },
-      // },
     },
   },
 ];

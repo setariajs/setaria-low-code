@@ -4,7 +4,7 @@
     <main-content  :drawingList="drawingList"
     ref="mainCotent"
       :formProps="formProps"
-      @setActiveComponent="setActiveComponent" />
+      @setActiveComponent="setActiveComponent"  @empty="empty"/>
     <right-side :formProps="formProps"
       :activeComponent="activeComponent" />
   </div>
@@ -13,6 +13,7 @@
 import LeftSide from '@/components/LeftSide/index.vue';
 import RightSide from '@/components/RightSide/index.vue';
 import MainContent from '@/components/MainContent/index.vue';
+import { saveIdGlobal } from '@/utils/db';
 
 export default {
   components: {
@@ -41,15 +42,26 @@ export default {
   mounted() {},
   methods: {
     addComponent(item) {
+      const loading = this.$loading({
+        lock: true,
+        text: '渲染中...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+      });
       this.drawingList.push(item);
       this.setActiveComponent(item);
       setTimeout(() => {
         this.$refs.mainCotent.setActiveComponentClass(item);
+        loading.close();
       }, 200);
     },
     setActiveComponent(item) {
       // TODO 默认添加时设置激活组件
       this.activeComponent = item;
+    },
+    empty() {
+      saveIdGlobal(100);
+      this.drawingList = [];
     },
   },
 };

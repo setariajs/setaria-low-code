@@ -45,6 +45,7 @@ export default {
       idGlobal,
       saveIdGlobalDebounce: debounce(saveIdGlobal, 400),
       draggerComponent: null,
+      tempCloneComponent: null,
     };
   },
   watch: {
@@ -57,15 +58,21 @@ export default {
   },
   methods: {
     addComponent(item) {
-      this.$emit('add', this.cloneComponent(item));
+      const cloneItem = this.getNewComponent(item);
+      this.$emit('add', cloneItem);
       // this.fetchData(clone)
       // this.drawingList.push(clone)
       // this.activeFormItem(clone)
     },
-    cloneComponent(origin) {
-      const clone = cloneDeep(origin);
+    getNewComponent(item) {
+      const clone = cloneDeep(item);
       this.idGlobal = getIdGlobal() + 1;
       clone.key = `field${this.idGlobal}`;
+      return clone;
+    },
+    cloneComponent(origin) {
+      const clone = this.getNewComponent(origin);
+      this.tempCloneComponent = clone;
       return clone;
     },
     // addComponent(item) {
@@ -76,6 +83,7 @@ export default {
     // },
     onEnd(item) {
       if (item.from !== item.to) {
+        this.$emit('add', this.tempCloneComponent);
         // console.log('endDrag', item);
         // this.$emit('add', this.draggerComponent);
         // this.$emit('endDrag', item);
@@ -88,6 +96,7 @@ export default {
 <style scoped lang="scss">
 .groupContainer {
   margin-bottom: 20px;
+  padding: 10px;
   .title {
     font-size: 16px;
   }
@@ -96,14 +105,14 @@ export default {
     flex-wrap: wrap;
     align-items: center;
     .componentsItem {
-      padding: 7px 20px;
+      padding: 10px 0;
       margin: 3px;
       border: 1px solid #efefef;
       background-color: #fcf3ff;
       cursor: move;
       border-radius: 3px;
       font-size: 14px;
-      width: 32%;
+      width: 46%;
       text-align: center;
       .componentsBody {
       }

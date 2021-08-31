@@ -47,9 +47,12 @@ export default {
 .rightSideContainer {
   border-left: 1px solid #e3e3e3;
   width: 350px;
-  height: calc(100% - 60px);
+  height: 100%;
   .el-scrollbar {
-    height: 100%;
+    height: calc(100% - 60px);
+    /deep/ .el-scrollbar__wrap {
+      overflow-x: hidden;
+    }
   }
   // /deep/ {
   //   .el-tabs,
