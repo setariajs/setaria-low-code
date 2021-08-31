@@ -5,7 +5,7 @@
 // }
 module.exports = {
   outputDir: 'docs',
-  publicPath: '/setaria-low-code',
+  publicPath: process.env.NODE_ENV === 'development' ? '/' : '/setaria-low-code',
   devServer: {
     port: 8088,
     // proxy: {
