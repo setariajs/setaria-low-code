@@ -5,6 +5,7 @@
 // }
 module.exports = {
   outputDir: 'docs',
+  publicPath: '/setaria-low-code',
   devServer: {
     port: 8088,
     // proxy: {
