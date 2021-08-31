@@ -4,6 +4,7 @@
 //   return path.join(__dirname, dir);
 // }
 module.exports = {
+  outputDir: 'docs',
   devServer: {
     port: 8088,
     // proxy: {
