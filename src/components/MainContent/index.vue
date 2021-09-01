@@ -1,6 +1,8 @@
 <template>
   <div class="mainContentContainer">
     <div class="topArea">
+       <el-button type="text"
+        icon="el-icon-setting" @click="showSortDeleteDialog">排序&删除</el-button>
       <el-button type="text"
         icon="el-icon-download" @click="downloadCode">下载Vue文件</el-button>
       <el-button type="text"
@@ -19,7 +21,7 @@
        tag="el-json-form"
       :component-data="draggableComponentData" -->
       <draggable class="drawingBoard"
-        draggable=".el-row .el-col"
+        draggable=".el-col"
         :list="drawingList"
         :animation="340"
         group="componentsGroup">
@@ -30,17 +32,19 @@
           :ui-schema="formUiSchema"
           :rules="rules">
         </el-json-form>
-
-      </draggable>
-      <!-- <div class="el-col"
+           <!-- <div class="el-col"
         v-for="(item,index) in drawingList"
         :key="index">{{item}}</div> -->
+
+      </draggable>
+
       <div v-show="!drawingList.length"
         class="emptyInfo">
         从左侧拖入或点选组件进行表单设计
       </div>
     </el-scrollbar>
     <input id="copyNode" type="hidden">
+    <sort-delete-dialog :visible.sync="visible" v-model="drawingList"/>
   </div>
 </template>
 
@@ -48,14 +52,16 @@
 import draggable from 'vuedraggable';
 import ClipboardJS from 'clipboard';
 import { saveAs } from 'file-saver';
+import SortDeleteDialog from './SortDeleteDialog.vue';
 import { generatVueCode } from '@/utils/generator';
+
 
 function hasClass(target, key) {
   return Array.from(target.classList).includes(key);
 }
 // TODO 增加顶部相关按钮
 export default {
-  components: { draggable },
+  components: { draggable, SortDeleteDialog },
   props: {
     drawingList: {
       type: Array,
@@ -72,6 +78,7 @@ export default {
       formSchema: {},
       formUiSchema: {},
       rules: {},
+      visible: false,
       // drawingList: [],
     };
   },
@@ -156,9 +163,9 @@ export default {
         properties,
       };
       this.formUiSchema = uiSchema;
-      // this.$nextTick(() => {
-      //   this.appendOperBtn();
-      // });
+      this.$nextTick(() => {
+        this.appendKeyInfo();
+      });
     },
     // 处理 uiSchema.ui:options 类型赋值问题
     processUiSchemaKey(uiOptions) {
@@ -169,13 +176,13 @@ export default {
         }
       });
     },
-    // 添加各种处理按钮
-    appendOperBtn() {
+    // 添加默认key属性
+    appendKeyInfo() {
       Array.from(document.querySelectorAll('.drawingBoard .el-col')).forEach(
         (dom, index) => {
-          if (!dom.innerHTML.includes('deleteOper')) {
-            dom.innerHTML += '<i class="el-icon-delete deleteOper"><i>';
-          }
+          // if (!dom.innerHTML.includes('deleteOper')) {
+          //   dom.innerHTML += '<i class="el-icon-delete deleteOper"><i>';
+          // }
           dom
             .querySelector('label')
             .setAttribute('data-key', this.drawingList[index].key);
@@ -247,6 +254,9 @@ export default {
         // this.drawingList = this.drawingList;
       }
       // this.$emit('setActiveComponent', item);
+    },
+    showSortDeleteDialog() {
+      this.visible = true;
     },
     empty() {
       this.$confirm('确定要清空所有组件吗？', '提示', { type: 'warning' }).then(
