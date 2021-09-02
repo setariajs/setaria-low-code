@@ -1,12 +1,23 @@
 <template>
   <div class="mainContentContainer">
     <div class="topArea">
-       <el-button type="text"
-        icon="el-icon-setting" @click="showSortDeleteDialog">排序&删除</el-button>
       <el-button type="text"
-        icon="el-icon-download" @click="downloadCode">下载Vue文件</el-button>
+        icon="el-icon-setting"
+        @click="showSortDeleteDialog">排序&删除</el-button>
       <el-button type="text"
-        icon="el-icon-document-copy" @click="copyCode">复制代码</el-button>
+        icon="el-icon-download"
+        @click="downloadCode">下载Vue文件</el-button>
+
+      <el-dropdown @command="copyCommand">
+        <el-button type="text"
+          icon="el-icon-document-copy" class="copyBtn">复制</el-button>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="all">复制完整代码</el-dropdown-item>
+          <el-dropdown-item  command="json">复制Json代码</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+      <!-- @click="copyCode" -->
+
       <el-button type="text"
         icon="el-icon-delete"
         @click="empty"
@@ -32,7 +43,7 @@
           :ui-schema="formUiSchema"
           :rules="rules">
         </el-json-form>
-           <!-- <div class="el-col"
+        <!-- <div class="el-col"
         v-for="(item,index) in drawingList"
         :key="index">{{item}}</div> -->
 
@@ -43,8 +54,10 @@
         从左侧拖入或点选组件进行表单设计
       </div>
     </el-scrollbar>
-    <input id="copyNode" type="hidden">
-    <sort-delete-dialog :visible.sync="visible" v-model="drawingList"/>
+    <input id="copyNode"
+      type="hidden">
+    <sort-delete-dialog :visible.sync="visible"
+      v-model="drawingList" />
   </div>
 </template>
 
@@ -53,8 +66,7 @@ import draggable from 'vuedraggable';
 import ClipboardJS from 'clipboard';
 import { saveAs } from 'file-saver';
 import SortDeleteDialog from './SortDeleteDialog.vue';
-import { generatVueCode } from '@/utils/generator';
-
+import { generatVueCode, getDataJson } from '@/utils/generator';
 
 function hasClass(target, key) {
   return Array.from(target.classList).includes(key);
@@ -79,17 +91,18 @@ export default {
       formUiSchema: {},
       rules: {},
       visible: false,
+      copyType: '',
       // drawingList: [],
     };
   },
   mounted() {
     document.querySelector('.drawingBoard').addEventListener('click', (e) => {
       this.bindFindComponent(e);
-      this.bindRomoveComponent(e);
+      // this.bindRomoveComponent(e);
     });
     const clipboard = new ClipboardJS('#copyNode', {
       text: () => {
-        const codeStr = this.generateCode();
+        const codeStr = this.generateCode(this.copyType);
         this.$notify({
           title: '成功',
           message: '代码已复制到剪切板，可粘贴。',
@@ -265,10 +278,23 @@ export default {
         },
       );
     },
-    generateCode() {
-      return generatVueCode(this.formProps, this.formSchema, this.formUiSchema, this.formModel);
+    generateCode(generateType) {
+      if (generateType === 'json') {
+        return getDataJson(
+          this.formSchema,
+          this.formUiSchema,
+          this.formModel,
+        );
+      }
+      return generatVueCode(
+        this.formProps,
+        this.formSchema,
+        this.formUiSchema,
+        this.formModel,
+      );
     },
-    copyCode() {
+    copyCommand(name) {
+      this.copyType = name;
       document.getElementById('copyNode').click();
     },
     downloadCode() {
@@ -288,6 +314,9 @@ export default {
     padding-right: 20px;
     .dangerText {
       color: #f56c6c;
+    }
+    .copyBtn{
+      margin: 0 7px;
     }
   }
 

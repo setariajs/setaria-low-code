@@ -5,6 +5,15 @@ function getStyle() {
 <style scoped lang="scss">
 </style>`;
 }
+
+export const getDataJson = (formSchema, formUiSchema, formModel) => JsBeautify.js(`
+  {
+    formSchema:${JSON.stringify(formSchema)},
+    formUiSchema:${JSON.stringify(formUiSchema)},
+    formModel:${JSON.stringify(formModel)},
+    formRules:{}
+}
+`);
 function getScript(formSchema, formUiSchema, formModel) {
   return `
 <script>
@@ -12,12 +21,7 @@ export default {
     components: {},
     props: [],
     data () {
-        return {
-            formSchema:${JSON.stringify(formSchema)},
-            formUiSchema:${JSON.stringify(formUiSchema)},
-            formModel:${JSON.stringify(formModel)},
-            formRules:{}
-        }
+        return ${getDataJson(formSchema, formUiSchema, formModel)}
     },
     computed: {},
     watch: {},
