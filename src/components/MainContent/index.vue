@@ -279,6 +279,7 @@ export default {
       );
     },
     generateCode(generateType) {
+      console.log(this.formUiSchema);
       if (generateType === 'json') {
         return getDataJson(
           this.formSchema,

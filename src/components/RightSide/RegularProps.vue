@@ -9,7 +9,7 @@
 
         <el-form-item label="表达式">
           <el-input v-model="item.pattern"
-            placeholder="请输入正则" />
+            placeholder="请输入正则" @blur="changePattern(item)"/>
         </el-form-item>
         <el-form-item label="错误提示"
           style="margin-bottom:0">
@@ -37,16 +37,6 @@
 </template>
 
 <script>
-// import draggable from 'vuedraggable';
-// import isNumber from 'lodash/isNumber';
-// import get from 'lodash/get';
-// import { propsMapping } from '@/components/components';
-// import findKey from 'lodash/findKey';
-
-// const oneOfTureFalse = [
-//   { const: false, title: '否' },
-//   { const: true, title: '是' },
-// ];
 export default {
   components: {},
   props: {
@@ -61,6 +51,12 @@ export default {
   computed: {},
   watch: {},
   methods: {
+    changePattern(item) {
+      if (item.pattern) {
+        // eslint-disable-next-line no-eval
+        item.pattern = eval(item.pattern);
+      }
+    },
     addRegular() {
       this.value.push({
         pattern: '',

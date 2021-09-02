@@ -389,9 +389,7 @@ export const selectComponents = [
         clearable: undefined,
       },
       'ui:nativeOn': {
-        click: () => {
-          this.$message.info('searchHelp click');
-        },
+        click: () => { this.$message.info('searchHelp click'); },
       },
     },
   },

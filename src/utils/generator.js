@@ -6,14 +6,45 @@ function getStyle() {
 </style>`;
 }
 
-export const getDataJson = (formSchema, formUiSchema, formModel) => JsBeautify.js(`
+export const getDataJson = (formSchema, formUiSchema, formModel) => {
+  // 格式化 RegExp Function类似的数据
+  console.log(formUiSchema);
+  let uiSchema = JSON.stringify(formUiSchema, (key, value) => {
+    if (value instanceof RegExp) {
+      return value.toString();
+    } if (value instanceof Function) {
+      return value.toString();
+    }
+    return value;
+  });
+
+
+  // 二次格式化化 RegExp类型数据
+  // eslint-disable-next-line no-useless-escape
+  uiSchema = uiSchema.replace(/\"pattern\"\:\".*?\"/g, (source) => {
+    let value = source.split(':"')[1];
+    value = value.substring(0, value.length - 1);
+    if (value) {
+      return `"pattern":${value}`;
+    }
+    return '"pattern":""';
+  });
+  // 二次格式化化 Function类型数据
+  // eslint-disable-next-line no-useless-escape
+  uiSchema = uiSchema.replace(/function .*?\(\)/g, '()=>').replace(/\\n/g, '')
+    .replace(/_this/g, 'this')
+  // eslint-disable-next-line no-useless-escape
+    .replace(/\"\(\)\=\>.*?\}\"/g, source => source.substring(1, source.length - 1));
+
+  return JsBeautify.js(`
   {
     formSchema:${JSON.stringify(formSchema)},
-    formUiSchema:${JSON.stringify(formUiSchema)},
+    formUiSchema:${uiSchema},
     formModel:${JSON.stringify(formModel)},
     formRules:{}
 }
 `);
+};
 function getScript(formSchema, formUiSchema, formModel) {
   return `
 <script>

@@ -22,30 +22,27 @@ export default {
       formSchema: {
         required: [],
         properties: {
-          field138: {
+          field223: {
             type: 'string',
-            title: '单行文本',
-          },
-          field139: {
-            type: 'string',
-            title: '密码',
+            title: '搜索帮助',
           },
         },
       },
       formUiSchema: {
-        field138: {
-          'ui:rules': [],
-          'ui:options': {},
-        },
-        field139: {
-          'ui:widget': 'password',
-          'ui:rules': [],
-          'ui:options': {},
+        field223: {
+          'ui:options': {
+            'suffix-icon': 'el-icon-search',
+            readonly: true,
+          },
+          'ui:nativeOn': {
+            click: () => {
+              this.$message.info('searchHelp click');
+            },
+          },
         },
       },
       formModel: {
-        field138: '',
-        field139: '',
+        field223: '',
       },
       formRules: {},
     };
