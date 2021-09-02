@@ -41,7 +41,9 @@ export const getDataJson = (formSchema, formUiSchema, formModel) => {
     .replace(/\"function.*?\}\"/g, (sources) => {
       const res = sources.replace(/"function\(\)/g, '()=>');
       return res.substring(0, res.length - 1).replace('b.', 'this.');
-    });
+    })
+  // eslint-disable-next-line no-useless-escape
+    .replace(/\\\"/g, '"');
 
   return JsBeautify.js(`
   {
