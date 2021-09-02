@@ -22,27 +22,23 @@ export default {
       formSchema: {
         required: [],
         properties: {
-          field223: {
+          field226: {
             type: 'string',
-            title: '搜索帮助',
+            title: '单行文本',
           },
         },
       },
       formUiSchema: {
-        field223: {
-          'ui:options': {
-            'suffix-icon': 'el-icon-search',
-            readonly: true,
-          },
-          'ui:nativeOn': {
-            click: () => {
-              this.$message.info('searchHelp click');
-            },
-          },
+        field226: {
+          'ui:rules': [{
+            pattern: /^1[3|4|5|7|8]\\d{9}$/,
+            message: '111',
+          }],
+          'ui:options': {},
         },
       },
       formModel: {
-        field223: '',
+        field226: '',
       },
       formRules: {},
     };
