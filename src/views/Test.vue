@@ -22,25 +22,18 @@ export default {
       formSchema: {
         required: [],
         properties: {
-          field115: {
-            type: 'string',
-            title: '单行文本',
-          },
-          field116: {
+          field119: {
             type: 'string',
             title: '搜索帮助',
+          },
+          field120: {
+            type: 'string',
+            title: '单行文本',
           },
         },
       },
       formUiSchema: {
-        field115: {
-          'ui:rules': [{
-            pattern: /^1[3|4|5|7|8]\d{9}$/,
-            message: '111',
-          }],
-          'ui:options': {},
-        },
-        field116: {
+        field119: {
           'ui:options': {
             'suffix-icon': 'el-icon-search',
             readonly: true,
@@ -51,10 +44,17 @@ export default {
             },
           },
         },
+        field120: {
+          'ui:rules': [{
+            pattern: /^1[3|4|5|7|8]\d{9}$/,
+            message: '1213123',
+          }],
+          'ui:options': {},
+        },
       },
       formModel: {
-        field115: '',
-        field116: '',
+        field119: '',
+        field120: '',
       },
       formRules: {},
     };
