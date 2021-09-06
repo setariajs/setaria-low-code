@@ -26,7 +26,7 @@
 
 <script>
 import get from 'lodash/get';
-import { propsMapping } from '@/components/components';
+import { propsMapping } from '@/components/formGenerator/components';
 import OptionProps from './OptionProps.vue';
 import RegularProps from './RegularProps.vue';
 

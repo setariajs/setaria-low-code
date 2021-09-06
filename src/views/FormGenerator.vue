@@ -10,9 +10,9 @@
   </div>
 </template>
 <script>
-import LeftSide from '@/components/LeftSide/index.vue';
-import RightSide from '@/components/RightSide/index.vue';
-import MainContent from '@/components/MainContent/index.vue';
+import LeftSide from '@/components/FormGenerator/LeftSide/Index.vue';
+import RightSide from '@/components/FormGenerator/RightSide/Index.vue';
+import MainContent from '@/components/FormGenerator/MainContent/Index.vue';
 import { saveIdGlobal } from '@/utils/db';
 
 export default {
