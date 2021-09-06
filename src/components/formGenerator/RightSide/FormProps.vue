@@ -14,10 +14,12 @@
 </template>
 
 <script>
-const oneOfTureFalse = [
-  { const: false, title: '否' },
-  { const: true, title: '是' },
-];
+
+import { oneOfTureFalse, formProps } from '@/components/formGenerator/components';
+// const oneOfTureFalse = [
+//   { const: false, title: '否' },
+//   { const: true, title: '是' },
+// ];
 export default {
   components: {},
   props: {
@@ -27,18 +29,7 @@ export default {
     },
     value: {
       type: Object,
-      default: () => ({
-        inline: false,
-        disabled: false,
-        'label-position': '',
-        'label-width': '100px',
-        'label-suffix': ':',
-        size: '',
-        columns: '',
-        'validate-on-rule-change': true,
-        'column-max-label-length': undefined,
-        'show-message': true,
-      }),
+      default: () => formProps,
     },
   },
   data() {

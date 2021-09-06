@@ -4,19 +4,30 @@
       <el-button type="text"
         icon="el-icon-setting"
         @click="showSortDeleteDialog">排序&删除</el-button>
-      <el-button type="text"
+
+      <el-dropdown @command="upDownCommand">
+        <el-button type="text"
+          icon="el-icon-sort"
+          class="copyBtn">上传/下载Vue文件</el-button>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="uplaod">上传Vue文件</el-dropdown-item>
+          <el-dropdown-item command="download">下载Vue文件</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+
+      <!-- <el-button type="text"
         icon="el-icon-download"
-        @click="downloadCode">下载Vue文件</el-button>
+        @click="downloadCode">下载Vue文件</el-button> -->
 
       <el-dropdown @command="copyCommand">
         <el-button type="text"
-          icon="el-icon-document-copy" class="copyBtn">复制</el-button>
+          icon="el-icon-document-copy"
+          class="copyBtn">复制</el-button>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="all">复制完整代码</el-dropdown-item>
-          <el-dropdown-item  command="json">复制Json代码</el-dropdown-item>
+          <el-dropdown-item command="json">复制Json代码</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
-      <!-- @click="copyCode" -->
 
       <el-button type="text"
         icon="el-icon-delete"
@@ -26,11 +37,6 @@
 
     <el-scrollbar class="scrollBar"
       :vertical="true">
-      <!-- draggable=".el-form-item" -->
-      <!--
-      handle=".el-form-item__label-wrap"
-       tag="el-json-form"
-      :component-data="draggableComponentData" -->
       <draggable class="drawingBoard"
         draggable=".el-col"
         :list="drawingList"
@@ -56,8 +62,15 @@
     </el-scrollbar>
     <input id="copyNode"
       type="hidden">
+    <input type="file"
+      accept=".vue"
+      id="uploader"
+      @change="changeFile"
+      style="display:none;" />
     <sort-delete-dialog :visible.sync="visible"
-      v-model="drawingList" />
+      v-model="drawingList"
+      @delete="setDefaultComponent" />
+
   </div>
 </template>
 
@@ -66,7 +79,12 @@ import draggable from 'vuedraggable';
 import ClipboardJS from 'clipboard';
 import { saveAs } from 'file-saver';
 import SortDeleteDialog from './SortDeleteDialog.vue';
-import { generatVueCode, getDataJson } from '@/utils/formGenerator';
+import {
+  generatVueCode,
+  getDataJson,
+  importVueFile,
+} from '@/utils/formGenerator';
+import { saveIdGlobal } from '@/utils/db';
 
 function hasClass(target, key) {
   return Array.from(target.classList).includes(key);
@@ -75,10 +93,10 @@ function hasClass(target, key) {
 export default {
   components: { draggable, SortDeleteDialog },
   props: {
-    drawingList: {
-      type: Array,
-      default: () => [],
-    },
+    // drawingList: {
+    //   type: Array,
+    //   default: () => [],
+    // },
     formProps: {
       type: Object,
       default: () => {},
@@ -92,7 +110,7 @@ export default {
       rules: {},
       visible: false,
       copyType: '',
-      // drawingList: [],
+      drawingList: [],
     };
   },
   mounted() {
@@ -124,50 +142,45 @@ export default {
     },
   },
   computed: {
-    draggableComponentData() {
-      return {
-        props: {
-          model: this.formModel,
-          schema: this.formSchema,
-          'ui-schema': this.formUiSchema,
-          rules: this.rules,
-        },
-      };
-    },
   },
   methods: {
+    addComponent(item) {
+      const loading = this.$loading({
+        lock: true,
+        text: '渲染中...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+      });
+      this.drawingList.push(item);
+      this.setActiveComponent(item);
+      setTimeout(() => {
+        this.setActiveComponentClass(item);
+        loading.close();
+      }, 200);
+    },
     initFormModel() {
-      console.log('drawingList change');
       const required = [];
       const properties = {};
       const uiSchema = {};
       const model = {};
       this.drawingList.forEach((item) => {
         const { key } = item;
-        // debugger;
-        // console.log(item.length);
-        if (!item.isDeleted) {
-          if (item.required) {
-            required.push(key);
-          }
-          properties[key] = this.formSchema[key] || item.schema;
-          uiSchema[key] = this.formUiSchema[key] || item.uiSchema;
-          // 处理 uiSchema.ui:options 类型赋值问题
-
-          this.processUiSchemaKey(uiSchema[key]['ui:options']);
-
-          // uiSchema[key]['ui:options'].type = 'month';
-
-          // TODO 需要判断类型
-          if (properties[key].type === 'array') {
-            model[key] = this.formModel[key] || [];
-          } else {
-            model[key] = this.formModel[key] || '';
-          }
-        } else {
-          properties[key] = {};
-          uiSchema[key] = {};
+        if (item.required) {
+          required.push(key);
         }
+
+        properties[key] = this.formSchema[key] || item.schema;
+        uiSchema[key] = this.formUiSchema[key] || item.uiSchema;
+        // 处理 uiSchema.ui:options 类型赋值问题
+        this.processUiSchemaKey(uiSchema[key]['ui:options']);
+
+        // TODO 需要判断类型
+        if (properties[key].type === 'array') {
+          model[key] = this.formModel[key] || [];
+        } else {
+          model[key] = this.formModel[key] || '';
+        }
+        properties[key].lcComponentName = item.lcComponentName;
       });
 
       this.formModel = model;
@@ -204,7 +217,6 @@ export default {
     },
     bindFindComponent(event) {
       let key = '';
-      // TODO 增加选中样式
       const labelNode = event.path.find(item => (item.className ? item.className.includes('el-form-item__label') : false));
       // if (event.target.nodeName.toLowerCase() === 'label') {
       //   key = event.target.getAttribute('for');
@@ -225,14 +237,14 @@ export default {
         }
       }
     },
-    bindRomoveComponent(event) {
-      if (hasClass(event.target, 'deleteOper')) {
-        const key = event.target.parentElement
-          .querySelector('label')
-          .getAttribute('data-key');
-        this.removeComponentByKey(key);
-      }
-    },
+    // bindRomoveComponent(event) {
+    //   if (hasClass(event.target, 'deleteOper')) {
+    //     const key = event.target.parentElement
+    //       .querySelector('label')
+    //       .getAttribute('data-key');
+    //     this.removeComponentByKey(key);
+    //   }
+    // },
     setActiveComponentClass(selectItem) {
       const array = Array.from(
         document.querySelectorAll('.drawingBoard .el-col'),
@@ -253,20 +265,11 @@ export default {
     setActiveComponent(item) {
       this.$emit('setActiveComponent', item);
     },
-    removeComponentByKey(key) {
-      console.log(key);
-      const index = this.drawingList.findIndex(item => item.key === key);
-      if (index !== -1) {
-        // TODO 删除有问题，需要修改jsonForm组件
-        this.drawingList[index].isDeleted = true; // .splice(index, 1);
-        this.initFormModel();
-        // this.$emit('removeComponent');
-        //   this.drawingList = JSON.parse(JSON.stringify(this.drawingList));
-        // console.log('removeComponentByKey');
-        // this.$refs.form.$forceUpdate();
-        // this.drawingList = this.drawingList;
+    setDefaultComponent() {
+      if (this.drawingList.length) {
+        this.setActiveComponent(this.drawingList[0]);
+        this.setActiveComponentClass(this.drawingList[0]);
       }
-      // this.$emit('setActiveComponent', item);
     },
     showSortDeleteDialog() {
       this.visible = true;
@@ -274,18 +277,15 @@ export default {
     empty() {
       this.$confirm('确定要清空所有组件吗？', '提示', { type: 'warning' }).then(
         () => {
-          this.$emit('empty');
+          saveIdGlobal(100);
+          this.drawingList = [];
+          this.setActiveComponent({});
         },
       );
     },
     generateCode(generateType) {
-      console.log(this.formUiSchema);
       if (generateType === 'json') {
-        return getDataJson(
-          this.formSchema,
-          this.formUiSchema,
-          this.formModel,
-        );
+        return getDataJson(this.formSchema, this.formUiSchema, this.formModel);
       }
       return generatVueCode(
         this.formProps,
@@ -298,10 +298,33 @@ export default {
       this.copyType = name;
       document.getElementById('copyNode').click();
     },
+    upDownCommand(name) {
+      if (name === 'download') {
+        this.downloadCode();
+      } else {
+        document.getElementById('uploader').click();
+      }
+    },
     downloadCode() {
       const codeStr = this.generateCode();
       const blob = new Blob([codeStr], { type: 'text/plain;charset=utf-8' });
       saveAs(blob, 'LowCodeForm.vue');
+    },
+    async changeFile(e) {
+      const loading = this.$loading({
+        lock: true,
+        text: '渲染中...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+      });
+
+      const { drawingList } = await importVueFile(e.target);
+      this.drawingList = drawingList;
+      document.getElementById('uploader').value = '';
+      setTimeout(() => {
+        this.setDefaultComponent();
+        loading.close();
+      }, 200);
     },
   },
 };
@@ -316,7 +339,7 @@ export default {
     .dangerText {
       color: #f56c6c;
     }
-    .copyBtn{
+    .copyBtn {
       margin: 0 7px;
     }
   }

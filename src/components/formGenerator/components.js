@@ -1,4 +1,4 @@
-const oneOfTureFalse = [
+export const oneOfTureFalse = [
   { const: false, title: '否' },
   { const: true, title: '是' },
 ];
@@ -115,7 +115,10 @@ export const propsMapping = {
         { const: 'week', title: '周' },
       ],
     },
-
+    lcComponentName: {
+      type: 'string',
+      title: '低代码平台组件名',
+    },
   },
   uiSchema: {
     required: commonUiSchemaSelect,
@@ -138,6 +141,9 @@ export const propsMapping = {
     'show-password': commonUiSchemaSelect,
     type: [],
     'datePicker.uiSchema.ui:options.type': commonUiSchemaSelect,
+    lcComponentName: {
+      'ui:hidden': true,
+    },
   },
 
 };
@@ -145,7 +151,7 @@ export const propsMapping = {
 // 输入型组件属性
 export const inputComponents = [
   {
-    componentName: 'input',
+    lcComponentName: 'input',
     required: false,
     key: undefined,
     schema: {
@@ -169,7 +175,7 @@ export const inputComponents = [
     },
   },
   {
-    componentName: 'input',
+    lcComponentName: 'password',
     required: false,
     key: undefined,
     schema: {
@@ -196,7 +202,7 @@ export const inputComponents = [
     },
   },
   {
-    componentName: 'input',
+    lcComponentName: 'textarea',
     required: false,
     key: undefined,
     schema: {
@@ -227,7 +233,7 @@ export const inputComponents = [
 // 选择性组件属性
 export const selectComponents = [
   {
-    componentName: 'select',
+    lcComponentName: 'select',
     required: false,
     key: undefined,
     schema: {
@@ -257,7 +263,7 @@ export const selectComponents = [
     },
   },
   {
-    componentName: 'radio',
+    lcComponentName: 'radio',
     required: false,
     key: undefined,
     schema: {
@@ -283,7 +289,7 @@ export const selectComponents = [
     },
   },
   {
-    componentName: 'checkbox',
+    lcComponentName: 'checkbox',
     required: false,
     key: undefined,
     schema: {
@@ -309,7 +315,7 @@ export const selectComponents = [
     },
   },
   {
-    componentName: 'datePicker',
+    lcComponentName: 'datePicker',
     required: false,
     key: undefined,
     schema: {
@@ -331,7 +337,7 @@ export const selectComponents = [
     },
   },
   {
-    componentName: 'dateTimePicker',
+    lcComponentName: 'dateTimePicker',
     required: false,
     key: undefined,
     schema: {
@@ -351,7 +357,7 @@ export const selectComponents = [
     },
   },
   {
-    componentName: 'timePicker',
+    lcComponentName: 'timePicker',
     required: false,
     key: undefined,
     schema: {
@@ -371,7 +377,7 @@ export const selectComponents = [
     },
   },
   {
-    componentName: 'searchHelp',
+    lcComponentName: 'searchHelp',
     required: false,
     key: undefined,
     schema: {
@@ -389,13 +395,28 @@ export const selectComponents = [
         clearable: undefined,
       },
       'ui:nativeOn': {
-        click: () => { this.$message.info('searchHelp click'); },
+        click: () => { console.log('bingo!!!!!'); },
       },
     },
   },
 ];
+// 表单属性
+export const formProps = {
+  inline: false,
+  disabled: false,
+  'label-position': '',
+  'label-width': '100px',
+  'label-suffix': ':',
+  size: '',
+  columns: '',
+  'validate-on-rule-change': true,
+  'column-max-label-length': undefined,
+  'show-message': true,
+};
 
 export default {
   inputComponents,
   selectComponents,
+  formProps,
+  oneOfTureFalse,
 };

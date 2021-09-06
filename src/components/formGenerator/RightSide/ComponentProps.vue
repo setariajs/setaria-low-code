@@ -44,9 +44,8 @@ export default {
       schema: {},
       uiSchema: {},
       innerValue: {},
-      subComponentType: '',
+      // subComponentType: '',
       componentName: '',
-      list: [],
     };
   },
   computed: {},
@@ -60,8 +59,14 @@ export default {
   },
   methods: {
     initComponent() {
-      this.componentName = this.value.componentName;
-      this.subComponentType = get(this.value, 'uiSchema.ui:widget', 'input');
+      if (!this.value.lcComponentName) {
+        this.schema = {};
+        this.uiSchema = {};
+        this.innerValue = {};
+        return;
+      }
+      this.componentName = this.value.lcComponentName;
+      // this.subComponentType = get(this.value, 'uiSchema.ui:widget', 'input');
       // 转换值为平层值
       const innerValue = Object.assign(
         {},

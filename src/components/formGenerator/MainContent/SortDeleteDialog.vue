@@ -11,7 +11,7 @@
         v-for="(item,index) in value"
         :key="index">
         <span>{{item.schema.title}} —— {{item.key}}</span>
-        <i class="el-icon-delete deleteItem" @click="value.splice(index, 1)"></i>
+        <i class="el-icon-delete deleteItem" @click="deleteItem(index)"></i>
       </div>
     </draggable>
       <div v-show="!value.length"
@@ -56,7 +56,12 @@ export default {
     },
   },
   mounted() {},
-  methods: {},
+  methods: {
+    deleteItem(index) {
+      this.value.splice(index, 1);
+      this.$emit('delete');
+    },
+  },
 };
 </script>
 <style  scoped lang="scss">

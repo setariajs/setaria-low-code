@@ -23,42 +23,28 @@ export default {
       formSchema: {
         required: [],
         properties: {
-          field235: {
+          field113: {
             type: 'string',
-            title: '单行文本',
-          },
-          field236: {
-            type: 'string',
-            title: '密码',
-          },
-          field237: {
-            type: 'string',
-            title: '文本域',
+            title: '搜索帮助',
+            lcComponentName: 'searchHelp',
           },
         },
       },
       formUiSchema: {
-        field235: {
-          'ui:rules': [],
-          'ui:options': {},
-        },
-        field236: {
-          'ui:widget': 'password',
-          'ui:rules': [],
-          'ui:options': {},
-        },
-        field237: {
-          'ui:widget': 'textarea',
-          'ui:rules': [],
+        field113: {
           'ui:options': {
-            'ui:rows': 2,
+            'suffix-icon': 'el-icon-search',
+            readonly: true,
+          },
+          'ui:nativeOn': {
+            click: () => {
+              console.log('bingo your are click now!!!!!');
+            },
           },
         },
       },
       formModel: {
-        field235: '',
-        field236: '',
-        field237: '',
+        field113: '',
       },
       formRules: {},
     };

@@ -1,4 +1,7 @@
 import JsBeautify from 'js-beautify';
+import get from 'lodash/get';
+// import cloneDeep from 'lodash/cloneDeep';
+import { inputComponents, selectComponents } from '@/components/formGenerator/components';
 
 function getStyle() {
   return `
@@ -6,9 +9,58 @@ function getStyle() {
 </style>`;
 }
 
+// 通过文件导入Vue文件，并获取组件List
+function getScriptByVueFile(codeStr) {
+  const drawingList = [];
+  // eslint-disable-next-line no-useless-escape
+  const p = /\<script\>.*?\<\/script\>/g;
+  codeStr = codeStr.replace(/\n/g, '').replace(/ /g, '');
+  const scriptStr = codeStr.match(p);
+  if (scriptStr) {
+    const jsCodeStr = scriptStr[0].replace('<script>exportdefault', '').replace('</script>', '');
+    // eslint-disable-next-line no-eval
+    const jsCode = eval(`(${jsCodeStr})`);
+    const data = jsCode.data();
+    const properties = get(data, 'formSchema.properties', {});
+    const formUiSchema = get(data, 'formUiSchema', {});
+    const requiredList = get(data, 'formSchema.required', []);
+
+    // 转换原始组件为map
+
+    const componentsObject = inputComponents.concat(selectComponents).reduce((res, { lcComponentName, schema, uiSchema }) => {
+      res[lcComponentName] = { schema, uiSchema };
+      return res;
+    }, {});
+
+    Object.keys(properties).forEach((key, index) => {
+      let required = false;
+      const item = properties[key];
+      const { lcComponentName } = item;
+      if (requiredList.includes(key)) {
+        required = true;
+      }
+      const uiSchema = Object.assign({}, componentsObject[lcComponentName].uiSchema, formUiSchema[key]);
+      // 处理默认导出时与本地key相冲突问题
+      let newKey = key;
+      if (key.includes('field')) {
+        newKey = key + index;
+      }
+
+      drawingList.push({
+        required,
+        key: newKey,
+        lcComponentName,
+        schema: Object.assign({}, componentsObject[lcComponentName].schema, item),
+        uiSchema,
+      });
+    });
+  }
+  return drawingList;
+}
+
+// 获取Vue中data部分json数据
 export const getDataJson = (formSchema, formUiSchema, formModel) => {
   // 格式化 RegExp Function类型的数据
-  console.log(formUiSchema);
   let uiSchema = JSON.stringify(formUiSchema, (key, value) => {
     if (value instanceof RegExp) {
       return value.toString();
@@ -40,7 +92,7 @@ export const getDataJson = (formSchema, formUiSchema, formModel) => {
   // eslint-disable-next-line no-useless-escape
     .replace(/\"function.*?\}\"/g, (sources) => {
       const res = sources.replace(/"function\(\)/g, '()=>');
-      return res.substring(0, res.length - 1).replace('b.', 'this.');
+      return res.substring(0, res.length - 1);// .replace('b.', 'this.');
     })
   // eslint-disable-next-line no-useless-escape
     .replace(/\\\"/g, '"');
@@ -73,6 +125,7 @@ export default {
 </script>
 `;
 }
+// 获取基础模板代码
 function getTemplate(formProps) {
   const propList = [];
   Object.keys(formProps).forEach((key) => {
@@ -102,12 +155,30 @@ function getTemplate(formProps) {
 </template>
     `;
 }
-
+// 生成Vue文件代码
 export const generatVueCode = (formProps, formSchema, formUiSchema, formModel) => {
   const code = getTemplate(formProps) + JsBeautify.html(getScript(formSchema, formUiSchema, formModel)) + getStyle();
 
   return code;
 };
+
+// 导入Vue代码
+export const importVueFile = targer => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  if (targer.files) {
+    reader.readAsText(targer.files[0], 'UTF-8');
+    reader.onload = (e) => {
+      const codeStr = e.target.result;
+      resolve({
+        drawingList: getScriptByVueFile(codeStr),
+      });
+    };
+  } else {
+    reject(new Error('上传Vue文件错误'));
+  }
+});
+
+
 export default {
   generatVueCode,
 };
