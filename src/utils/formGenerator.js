@@ -88,6 +88,7 @@ function getTemplate(formProps) {
 
   return `
 <template>
+   <!-- generator by setaria-low-code v1.0 -->
     <div>
         <el-json-form ref="form"
             :model="formModel"

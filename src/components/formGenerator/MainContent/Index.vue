@@ -66,7 +66,7 @@ import draggable from 'vuedraggable';
 import ClipboardJS from 'clipboard';
 import { saveAs } from 'file-saver';
 import SortDeleteDialog from './SortDeleteDialog.vue';
-import { generatVueCode, getDataJson } from '@/utils/generator';
+import { generatVueCode, getDataJson } from '@/utils/formGenerator';
 
 function hasClass(target, key) {
   return Array.from(target.classList).includes(key);

@@ -1,5 +1,6 @@
 
 <template>
+   <!-- generator by setaria-low-code v1.0 -->
     <div>
         <el-json-form ref="form"
             :model="formModel"
@@ -22,39 +23,42 @@ export default {
       formSchema: {
         required: [],
         properties: {
-          field119: {
-            type: 'string',
-            title: '搜索帮助',
-          },
-          field120: {
+          field235: {
             type: 'string',
             title: '单行文本',
+          },
+          field236: {
+            type: 'string',
+            title: '密码',
+          },
+          field237: {
+            type: 'string',
+            title: '文本域',
           },
         },
       },
       formUiSchema: {
-        field119: {
-          'ui:options': {
-            'suffix-icon': 'el-icon-search',
-            readonly: true,
-          },
-          'ui:nativeOn': {
-            click: () => {
-              this.$message.info('searchHelp click');
-            },
-          },
-        },
-        field120: {
-          'ui:rules': [{
-            pattern: /^1[3|4|5|7|8]\d{9}$/,
-            message: '1213123',
-          }],
+        field235: {
+          'ui:rules': [],
           'ui:options': {},
+        },
+        field236: {
+          'ui:widget': 'password',
+          'ui:rules': [],
+          'ui:options': {},
+        },
+        field237: {
+          'ui:widget': 'textarea',
+          'ui:rules': [],
+          'ui:options': {
+            'ui:rows': 2,
+          },
         },
       },
       formModel: {
-        field119: '',
-        field120: '',
+        field235: '',
+        field236: '',
+        field237: '',
       },
       formRules: {},
     };
