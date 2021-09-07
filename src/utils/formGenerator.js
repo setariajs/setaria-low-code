@@ -1,7 +1,6 @@
 import JsBeautify from 'js-beautify';
 import get from 'lodash/get';
-// import cloneDeep from 'lodash/cloneDeep';
-import { inputComponents, selectComponents } from '@/components/formGenerator/components';
+import { inputComponents, selectComponents, formProps } from '@/components/formGenerator/components';
 
 function getStyle() {
   return `
@@ -56,6 +55,36 @@ function getScriptByVueFile(codeStr) {
     });
   }
   return drawingList;
+}
+// 获取template 中的jsomForm属性信息
+function getDomProps(codeStr) {
+  codeStr = codeStr.replace(/\n/g, '');
+  // console.log()
+  // eslint-disable-next-line no-useless-escape
+  const formStr = codeStr.match(/\<el-json-form .*?\/\>/g);
+  const list = formStr[0].replace('/>', '').split(' :');
+  list.shift();
+
+  const keys = Object.keys(formProps);
+
+  list.forEach((item) => {
+    item.trim();
+    console.log(item);
+    const kv = item.split('=');
+    const key = kv[0];
+    // eslint-disable-next-line no-useless-escape
+    const value = kv[1].replace(/\"/g, '').replace(/\'/g, '').replace(/ /g, '');
+    if (keys.includes(key)) {
+      console.log(key, value);
+      if (['true', 'false'].includes(value)) {
+        formProps[key] = value === 'true';
+      } else {
+        formProps[key] = value;
+      }
+    }
+    //
+  });
+  return formProps;
 }
 
 // 获取Vue中data部分json数据
@@ -126,14 +155,14 @@ export default {
 `;
 }
 // 获取基础模板代码
-function getTemplate(formProps) {
+function getTemplate(props) {
   const propList = [];
-  Object.keys(formProps).forEach((key) => {
-    if (formProps[key]) {
-      if (typeof formProps[key] === 'string') {
-        propList.push(`:${key}="'${formProps[key]}'"`);
+  Object.keys(props).forEach((key) => {
+    if (!(props[key] === '' || props[key] === undefined)) {
+      if (typeof props[key] === 'string') {
+        propList.push(`:${key}="'${props[key]}'"`);
       } else {
-        propList.push(`:${key}="${formProps[key]}"`);
+        propList.push(`:${key}="${props[key]}"`);
       }
     }
   });
@@ -156,8 +185,8 @@ function getTemplate(formProps) {
     `;
 }
 // 生成Vue文件代码
-export const generatVueCode = (formProps, formSchema, formUiSchema, formModel) => {
-  const code = getTemplate(formProps) + JsBeautify.html(getScript(formSchema, formUiSchema, formModel)) + getStyle();
+export const generatVueCode = (props, formSchema, formUiSchema, formModel) => {
+  const code = getTemplate(props) + JsBeautify.html(getScript(formSchema, formUiSchema, formModel)) + getStyle();
 
   return code;
 };
@@ -171,6 +200,7 @@ export const importVueFile = targer => new Promise((resolve, reject) => {
       const codeStr = e.target.result;
       resolve({
         drawingList: getScriptByVueFile(codeStr),
+        formProps: getDomProps(codeStr),
       });
     };
   } else {

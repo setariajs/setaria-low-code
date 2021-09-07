@@ -16,6 +16,7 @@
 <script>
 
 import { oneOfTureFalse, formProps } from '@/components/formGenerator/components';
+
 // const oneOfTureFalse = [
 //   { const: false, title: '否' },
 //   { const: true, title: '是' },

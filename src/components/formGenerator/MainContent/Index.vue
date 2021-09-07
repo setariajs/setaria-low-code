@@ -140,6 +140,14 @@ export default {
         this.initFormModel();
       },
     },
+    'formProps.inline': {
+      handler() {
+        this.initFormModel();
+        setTimeout(() => {
+          this.setDefaultComponent();
+        }, 500);
+      },
+    },
   },
   computed: {
   },
@@ -204,7 +212,7 @@ export default {
     },
     // 添加默认key属性
     appendKeyInfo() {
-      Array.from(document.querySelectorAll('.drawingBoard .el-col')).forEach(
+      Array.from(document.querySelectorAll('.drawingBoard .el-form-item')).forEach(
         (dom, index) => {
           // if (!dom.innerHTML.includes('deleteOper')) {
           //   dom.innerHTML += '<i class="el-icon-delete deleteOper"><i>';
@@ -247,11 +255,11 @@ export default {
     // },
     setActiveComponentClass(selectItem) {
       const array = Array.from(
-        document.querySelectorAll('.drawingBoard .el-col'),
+        document.querySelectorAll('.drawingBoard .el-form-item'),
       );
       const findObj = array.find(item => item.querySelector(`label[data-key="${selectItem.key}"]`));
       const alreadyItem = document.querySelector(
-        '.drawingBoard .el-col.selected',
+        '.drawingBoard .el-form-item.selected',
       );
       if (alreadyItem) {
         alreadyItem.classList.remove('selected');
@@ -318,8 +326,9 @@ export default {
         background: 'rgba(0, 0, 0, 0.7)',
       });
 
-      const { drawingList } = await importVueFile(e.target);
+      const { drawingList, formProps } = await importVueFile(e.target);
       this.drawingList = drawingList;
+      this.$emit('changeFormProps', formProps);
       document.getElementById('uploader').value = '';
       setTimeout(() => {
         this.setDefaultComponent();
@@ -366,26 +375,26 @@ export default {
     color: #ccb1ea;
     letter-spacing: 4px;
   }
-  /deep/ .el-col {
-    position: relative;
-    .deleteOper {
-      content: "\E6D7";
-      display: none;
-      font-family: element-icons !important;
-      border-radius: 50%;
-      border: 1px solid #f44336;
-      color: #f44336;
-      font-size: 12px;
-      width: 16px;
-      height: 16px;
-      text-align: center;
-      line-height: 15px;
-      padding-left: 1px;
-      cursor: pointer;
-      position: absolute;
-      bottom: 0;
-      right: 5px;
-    }
+  /deep/ .el-form-item {
+    // position: relative;
+    // .deleteOper {
+    //   content: "\E6D7";
+    //   display: none;
+    //   font-family: element-icons !important;
+    //   border-radius: 50%;
+    //   border: 1px solid #f44336;
+    //   color: #f44336;
+    //   font-size: 12px;
+    //   width: 16px;
+    //   height: 16px;
+    //   text-align: center;
+    //   line-height: 15px;
+    //   padding-left: 1px;
+    //   cursor: pointer;
+    //   position: absolute;
+    //   bottom: 0;
+    //   right: 5px;
+    // }
     &:hover {
       background: #fcf3ff;
       .deleteOper {

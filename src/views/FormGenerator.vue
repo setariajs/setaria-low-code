@@ -4,6 +4,7 @@
     <main-content :drawingList="drawingList"
       ref="mainCotent"
       :formProps="formProps"
+      @changeFormProps="changeFormProps"
       @setActiveComponent="setActiveComponent" />
     <right-side :formProps="formProps"
       :activeComponent="activeComponent" />
@@ -36,6 +37,9 @@ export default {
     setActiveComponent(item) {
       // TODO 默认添加时设置激活组件
       this.activeComponent = item;
+    },
+    changeFormProps(props) {
+      this.formProps = props;
     },
   },
 };
