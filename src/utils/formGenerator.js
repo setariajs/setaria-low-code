@@ -1,6 +1,6 @@
 import JsBeautify from 'js-beautify';
 import get from 'lodash/get';
-import { inputComponents, selectComponents, formProps } from '@/components/formGenerator/components';
+import { inputComponents, selectComponents, formFormProps } from '@/components/formGenerator/components';
 
 function getStyle() {
   return `
@@ -65,7 +65,7 @@ function getDomProps(codeStr) {
   const list = formStr[0].replace('/>', '').split(' :');
   list.shift();
 
-  const keys = Object.keys(formProps);
+  const keys = Object.keys(formFormProps);
 
   list.forEach((item) => {
     item.trim();
@@ -77,14 +77,14 @@ function getDomProps(codeStr) {
     if (keys.includes(key)) {
       console.log(key, value);
       if (['true', 'false'].includes(value)) {
-        formProps[key] = value === 'true';
+        formFormProps[key] = value === 'true';
       } else {
-        formProps[key] = value;
+        formFormProps[key] = value;
       }
     }
     //
   });
-  return formProps;
+  return formFormProps;
 }
 
 // 获取Vue中data部分json数据
@@ -170,7 +170,7 @@ function getTemplate(props) {
 
   return `
 <template>
-   <!-- generator by setaria-low-code v1.0 -->
+   <!-- generator by setaria-low-code FormGenerator v1.0 -->
     <div>
         <el-json-form ref="form"
             :model="formModel"
@@ -200,7 +200,7 @@ export const importVueFile = targer => new Promise((resolve, reject) => {
       const codeStr = e.target.result;
       resolve({
         drawingList: getScriptByVueFile(codeStr),
-        formProps: getDomProps(codeStr),
+        formFormProps: getDomProps(codeStr),
       });
     };
   } else {
@@ -215,7 +215,7 @@ export default {
 
 
 // { /*
-// v-bind="formProps"
+// v-bind="formFormProps"
 
 
 //  */ }

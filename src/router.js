@@ -12,6 +12,11 @@ export default new Router({
       component: FormGenerator,
     },
     {
+      path: '/table',
+      name: 'tableGenerator',
+      component: () => import('@/views/TableGenerator.vue'),
+    },
+    {
       path: '/test',
       name: 'test',
       component: () => import('@/views/Test.vue'),

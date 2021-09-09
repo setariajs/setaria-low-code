@@ -20,8 +20,10 @@
       </div>
 
     <div slot="footer">
+      <el-button-group class="dialog-bt-group">
         <el-button type="info"
           @click="innerVisible = false">关闭</el-button>
+      </el-button-group>
     </div>
   </el-dialog>
 </template>

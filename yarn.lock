@@ -5813,6 +5813,11 @@ mixin-deep@^1.2.0:
   dependencies:
     minimist "^1.2.5"
 
+moment@^2.29.1:
+  version "2.29.1"
+  resolved "https://registry.nlark.com/moment/download/moment-2.29.1.tgz#b2be769fa31940be9eeea6469c075e35006fa3d3"
+  integrity sha1-sr52n6MZQL6e7qZGnAdeNQBvo9M=
+
 move-concurrently@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npm.taobao.org/move-concurrently/download/move-concurrently-1.0.1.tgz#be2c005fda32e0b29af1f05d7c4b33214c701f92"
@@ -6128,6 +6133,11 @@ number-is-nan@^1.0.0:
   version "1.0.1"
   resolved "https://registry.npm.taobao.org/number-is-nan/download/number-is-nan-1.0.1.tgz#097b602b53422a522c1afb8790318336941a011d"
   integrity sha1-CXtgK1NCKlIsGvuHkDGDNpQaAR0=
+
+numeral@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.nlark.com/numeral/download/numeral-2.0.6.tgz#4ad080936d443c2561aed9f2197efffe25f4e506"
+  integrity sha1-StCAk21EPCVhrtnyGX7//iX05QY=
 
 oauth-sign@~0.9.0:
   version "0.9.0"
@@ -7775,18 +7785,26 @@ set-value@^2.0.0, set-value@^2.0.1:
     is-plain-object "^2.0.3"
     split-string "^3.0.1"
 
-setaria-ui@^1.6.2:
-  version "1.6.2"
-  resolved "https://registry.nlark.com/setaria-ui/download/setaria-ui-1.6.2.tgz#5a760c3adc6ce3ed52dc9bcbd0e819d72cafebc9"
-  integrity sha1-WnYMOtxs4+1S3JvL0OgZ1yyv68k=
+setaria-ui@^1.7.7:
+  version "1.7.7"
+  resolved "https://registry.yarnpkg.com/setaria-ui/-/setaria-ui-1.7.7.tgz#b7a9922a91f888d612637717daf5c7a52ae91af2"
+  integrity sha512-NgGOQuPENeKKEMzvHim7Qysw09RIEpXkgyYSyNCTAneeWLVPkeA3edMJ/zqd6sX13SmHOo6732mBWjxAZeCOjA==
   dependencies:
     async-validator "~1.8.1"
     babel-helper-vue-jsx-merge-props "^2.0.0"
     deepmerge "^1.2.0"
     draggabilly "^2.1.1"
+    moment "^2.29.1"
     normalize-wheel "^1.0.1"
+    numeral "^2.0.6"
     resize-observer-polyfill "^1.5.0"
     throttle-debounce "^1.0.1"
+    vxe-table "^3.3.12"
+    vxe-table-plugin-element "^1.11.0"
+    vxe-table-plugin-export-xlsx "^2.2.1"
+    vxe-table-plugin-menus "^1.6.1"
+    vxe-table-plugin-virtual-tree "^0.6.7"
+    xe-utils "^3.3.1"
 
 setimmediate@^1.0.4:
   version "1.0.5"
@@ -8983,6 +9001,31 @@ vuex@^3.0.1:
   resolved "https://registry.nlark.com/vuex/download/vuex-3.6.2.tgz?cache=0&sync_timestamp=1623945323795&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fvuex%2Fdownload%2Fvuex-3.6.2.tgz#236bc086a870c3ae79946f107f16de59d5895e71"
   integrity sha1-I2vAhqhww655lG8QfxbeWdWJXnE=
 
+vxe-table-plugin-element@^1.11.0:
+  version "1.11.2"
+  resolved "https://registry.nlark.com/vxe-table-plugin-element/download/vxe-table-plugin-element-1.11.2.tgz#541631d3d39a13a525773da4c6cf4a54722f2f17"
+  integrity sha1-VBYx09OaE6Uldz2kxs9KVHIvLxc=
+
+vxe-table-plugin-export-xlsx@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.npm.taobao.org/vxe-table-plugin-export-xlsx/download/vxe-table-plugin-export-xlsx-2.2.1.tgz#7eba669bd71b7e469b3c9e4d368d98626b837894"
+  integrity sha1-frpmm9cbfkabPJ5NNo2YYmuDeJQ=
+
+vxe-table-plugin-menus@^1.6.1:
+  version "1.6.2"
+  resolved "https://registry.nlark.com/vxe-table-plugin-menus/download/vxe-table-plugin-menus-1.6.2.tgz#858a0eae12d6472e940f8ebc291997fe14ea6fd7"
+  integrity sha1-hYoOrhLWRy6UD468KRmX/hTqb9c=
+
+vxe-table-plugin-virtual-tree@^0.6.7:
+  version "0.6.10"
+  resolved "https://registry.nlark.com/vxe-table-plugin-virtual-tree/download/vxe-table-plugin-virtual-tree-0.6.10.tgz#f6258336983a6c27f10daeaca3dace28c3d44dc5"
+  integrity sha1-9iWDNpg6bCfxDa6so9rOKMPUTcU=
+
+vxe-table@^3.3.12:
+  version "3.3.12"
+  resolved "https://registry.nlark.com/vxe-table/download/vxe-table-3.3.12.tgz#5f624915e5c0834a3e89caa227db9d36d1d7bd1e"
+  integrity sha1-X2JJFeXAg0o+icqiJ9udNtHXvR4=
+
 watchpack-chokidar2@^2.0.1:
   version "2.0.1"
   resolved "https://registry.npm.taobao.org/watchpack-chokidar2/download/watchpack-chokidar2-2.0.1.tgz#38500072ee6ece66f3769936950ea1771be1c957"
@@ -9250,6 +9293,11 @@ ws@^6.0.0, ws@^6.2.1:
   integrity sha1-3Vzb1XqZeZFgl2UtePHMX66gwy4=
   dependencies:
     async-limiter "~1.0.0"
+
+xe-utils@^3.3.1:
+  version "3.3.2"
+  resolved "https://registry.nlark.com/xe-utils/download/xe-utils-3.3.2.tgz?cache=0&sync_timestamp=1630590908649&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fxe-utils%2Fdownload%2Fxe-utils-3.3.2.tgz#b05817b094a6b40d897cd8d5df62ed716ff845f5"
+  integrity sha1-sFgXsJSmtA2JfNjV32LtcW/4RfU=
 
 xtend@^4.0.0, xtend@~4.0.1:
   version "4.0.2"

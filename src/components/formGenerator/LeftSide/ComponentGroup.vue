@@ -18,6 +18,9 @@
       </div>
     </draggable>
 
+    <component-type-dialog :visible.sync="visible" @submit="submitType"/>
+
+
   </div>
 </template>
 
@@ -25,11 +28,17 @@
 import draggable from 'vuedraggable';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
+import ComponentTypeDialog from './ComponentTypeDialog.vue';
 import { getIdGlobal, saveIdGlobal } from '@/utils/db';
 
 const idGlobal = getIdGlobal();
 export default {
-  components: { draggable },
+  components: { draggable, ComponentTypeDialog },
+  inject: {
+    generatorType: {
+      default: 'form',
+    },
+  },
   props: {
     title: {
       type: String,
@@ -46,6 +55,7 @@ export default {
       saveIdGlobalDebounce: debounce(saveIdGlobal, 400),
       draggerComponent: null,
       tempCloneComponent: null,
+      visible: false,
     };
   },
   watch: {
@@ -59,10 +69,16 @@ export default {
   methods: {
     addComponent(item) {
       const cloneItem = this.getNewComponent(item);
-      this.$emit('add', cloneItem);
-      // this.fetchData(clone)
-      // this.drawingList.push(clone)
-      // this.activeFormItem(clone)
+      // 是否需要二次弹出确认
+      if (this.generatorType === 'table') {
+        this.tempCloneComponent = cloneItem;
+        this.visible = true;
+      } else {
+        this.$emit('add', cloneItem);
+      }
+    },
+    submitType(type) {
+      this.$emit('add', this.tempCloneComponent, type);
     },
     getNewComponent(item) {
       const clone = cloneDeep(item);
@@ -75,18 +91,9 @@ export default {
       this.tempCloneComponent = clone;
       return clone;
     },
-    // addComponent(item) {
-    //   this.$emit('add', item);
-    // },
-    // cloneComponent(item) {
-    //   this.$emit('clone', item);
-    // },
     onEnd(item) {
       if (item.from !== item.to) {
         this.$emit('add', this.tempCloneComponent);
-        // console.log('endDrag', item);
-        // this.$emit('add', this.draggerComponent);
-        // this.$emit('endDrag', item);
       }
     },
   },

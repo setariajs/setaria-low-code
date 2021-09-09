@@ -13,8 +13,8 @@
 <script>
 import LeftSide from '@/components/formGenerator/LeftSide/Index.vue';
 import RightSide from '@/components/formGenerator/RightSide/Index.vue';
-import MainContent from '@/components/formGenerator/MainContent/Index.vue';
-import { formFormProps } from '@/components/formGenerator/components';
+import MainContent from '@/components/tableGenerator/MainContent/Index.vue';
+import { tableFormProps } from '@/components/formGenerator/components';
 
 export default {
   components: {
@@ -23,19 +23,20 @@ export default {
     MainContent,
   },
   provide: {
-    generatorType: 'form',
+    generatorType: 'table',
   },
   data() {
     return {
       drawingList: [],
       activeComponent: {},
-      formProps: formFormProps,
+      formProps: tableFormProps,
     };
   },
   mounted() {},
   methods: {
-    addComponent(item) {
-      this.$refs.mainCotent.addComponent(item);
+    addComponent(item, type) {
+      console.log(item, type);
+      this.$refs.mainCotent.addComponent(item, type);
     },
     setActiveComponent(item) {
       // TODO 默认添加时设置激活组件

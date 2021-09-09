@@ -28,8 +28,8 @@ export default {
     };
   },
   methods: {
-    addComponent(item) {
-      this.$emit('add', item);
+    addComponent(item, type) {
+      this.$emit('add', item, type);
     },
   },
 };

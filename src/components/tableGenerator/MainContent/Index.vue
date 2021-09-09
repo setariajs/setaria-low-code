@@ -4,10 +4,10 @@
       <div class="leftArea">
         <el-button type="text"
           icon="el-icon-notebook-2"
-          @click="$router.push('/table')">前往表格设计器</el-button>
+          @click="$router.push('/')">前往表单设计器</el-button>
       </div>
       <div class="rightArea">
-        <el-button type="text"
+        <!-- <el-button type="text"
           icon="el-icon-s-operation"
           @click="showSortDeleteDialog">排序&删除</el-button>
 
@@ -21,9 +21,6 @@
           </el-dropdown-menu>
         </el-dropdown>
 
-        <!-- <el-button type="text"
-        icon="el-icon-download"
-        @click="downloadCode">下载Vue文件</el-button> -->
 
         <el-dropdown @command="copyCommand">
           <el-button type="text"
@@ -38,15 +35,33 @@
         <el-button type="text"
           icon="el-icon-delete"
           @click="empty"
-          class="dangerText">清空</el-button>
+          class="dangerText">清空</el-button> -->
       </div>
     </div>
 
     <el-scrollbar class="scrollBar"
       :vertical="true">
-      <draggable class="drawingBoard"
+
+      <el-card shadow="never"
+        class="drawingBoard"
+        :header="'搜索条件'">
+        <!-- :before-submit="beforeSubmit"
+                   :after-submit="afterSubmit"
+                   @change="handleChange"
+                   @clear="handleClear" -->
+        <el-query-filter v-model="formModel"
+          v-bind="formProps"
+          :normal-schema="normalSchema"
+          :normal-ui-schema="normalUiSchema"
+          :advance-schema="advanceSchema"
+          :advance-ui-schema="advanceUiSchema">
+        </el-query-filter>
+
+      </el-card>
+
+      <!-- <draggable
         draggable=".el-col"
-        :list="drawingList"
+        :list="normalList"
         :animation="340"
         group="componentsGroup">
         <el-json-form ref="form"
@@ -56,51 +71,48 @@
           :ui-schema="formUiSchema"
           :rules="rules">
         </el-json-form>
-        <!-- <div class="el-col"
-        v-for="(item,index) in drawingList"
-        :key="index">{{item}}</div> -->
 
-      </draggable>
+      </draggable> -->
 
-      <div v-show="!drawingList.length"
+      <div v-show="!normalList.length"
         class="emptyInfo">
-        从左侧拖入或点选组件进行表单设计
+        从左侧点选组件进行表单设计
       </div>
     </el-scrollbar>
-    <input id="copyNode"
+    <!-- <input id="copyNode"
       type="hidden">
     <input type="file"
       accept=".vue"
       id="uploader"
       @change="changeFile"
-      style="display:none;" />
-    <sort-delete-dialog :visible.sync="visible"
-      v-model="drawingList"
-      @delete="setDefaultComponent" />
+      style="display:none;" /> -->
+    <!-- <sort-delete-dialog :visible.sync="visible"
+        v-model="normalList"
+        @delete="setDefaultComponent" /> -->
 
   </div>
 </template>
 
 <script>
-import draggable from 'vuedraggable';
-import ClipboardJS from 'clipboard';
-import { saveAs } from 'file-saver';
-import SortDeleteDialog from './SortDeleteDialog.vue';
-import {
-  generatVueCode,
-  getDataJson,
-  importVueFile,
-} from '@/utils/formGenerator';
-import { saveIdGlobal } from '@/utils/db';
+// import draggable from 'vuedraggable';
+// import ClipboardJS from 'clipboard';
+// import { saveAs } from 'file-saver';
+// import SortDeleteDialog from './SortDeleteDialog.vue';
+// import {
+//   generatVueCode,
+//   getDataJson,
+//   importVueFile,
+// } from '@/utils/formGenerator';
+// import { saveIdGlobal } from '@/utils/db';
 
 function hasClass(target, key) {
   return Array.from(target.classList).includes(key);
 }
 // TODO 增加顶部相关按钮
 export default {
-  components: { draggable, SortDeleteDialog },
+  components: {},
   props: {
-    // drawingList: {
+    // normalList: {
     //   type: Array,
     //   default: () => [],
     // },
@@ -112,12 +124,16 @@ export default {
   data() {
     return {
       formModel: {},
-      formSchema: {},
-      formUiSchema: {},
-      rules: {},
+      normalFormModel: {},
+      normalSchema: {},
+      normalUiSchema: {},
+      advanceFormModel: {},
+      advanceSchema: {},
+      advanceUiSchema: {},
       visible: false,
       copyType: '',
-      drawingList: [],
+      normalList: [],
+      advanceList: [],
     };
   },
   mounted() {
@@ -125,66 +141,117 @@ export default {
       this.bindFindComponent(e);
       // this.bindRomoveComponent(e);
     });
-    const clipboard = new ClipboardJS('#copyNode', {
-      text: () => {
-        const codeStr = this.generateCode(this.copyType);
-        this.$notify({
-          title: '成功',
-          message: '代码已复制到剪切板，可粘贴。',
-          type: 'success',
-        });
-        return codeStr;
-      },
-    });
-    clipboard.on('error', () => {
-      this.$message.error('代码复制失败');
-    });
+    // const clipboard = new ClipboardJS('#copyNode', {
+    //   text: () => {
+    //     const codeStr = this.generateCode(this.copyType);
+    //     this.$notify({
+    //       title: '成功',
+    //       message: '代码已复制到剪切板，可粘贴。',
+    //       type: 'success',
+    //     });
+    //     return codeStr;
+    //   },
+    // });
+    // clipboard.on('error', () => {
+    //   this.$message.error('代码复制失败');
+    // });
   },
   watch: {
-    drawingList: {
+    normalList: {
       deep: true,
       handler() {
-        this.initFormModel();
+        this.initNormalSchema();
       },
     },
-    'formProps.inline': {
+    advanceList: {
+      deep: true,
       handler() {
-        this.initFormModel();
-        setTimeout(() => {
-          this.setDefaultComponent();
-        }, 500);
+        this.initAdvanceSchema();
       },
     },
+    // 'formProps.inline': {
+    //   handler() {
+    //     this.initFormModel();
+    //     setTimeout(() => {
+    //       this.setDefaultComponent();
+    //     }, 500);
+    //   },
+    // },
   },
   computed: {},
   methods: {
-    addComponent(item) {
+    addComponent(item, type) {
       const loading = this.$loading({
         lock: true,
         text: '渲染中...',
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)',
       });
-      this.drawingList.push(item);
-      this.setActiveComponent(item);
+
+      if (type === 'normal') {
+        this.normalList.push(item);
+      } else if (type === 'advance') {
+        this.advanceList.push(item);
+      }
+
+      // this.setActiveComponent(item);
       setTimeout(() => {
-        this.setActiveComponentClass(item);
+        //   this.setActiveComponentClass(item);
         loading.close();
       }, 200);
     },
-    initFormModel() {
+    initNormalSchema() {
       const required = [];
       const properties = {};
       const uiSchema = {};
       const model = {};
-      this.drawingList.forEach((item) => {
+      this.normalList.forEach((item) => {
         const { key } = item;
         if (item.required) {
           required.push(key);
         }
 
-        properties[key] = this.formSchema[key] || item.schema;
-        uiSchema[key] = this.formUiSchema[key] || item.uiSchema;
+        properties[key] = this.normalSchema[key] || item.schema;
+        uiSchema[key] = this.normalUiSchema[key] || item.uiSchema;
+        // 处理 uiSchema.ui:options 类型赋值问题
+        this.processUiSchemaKey(uiSchema[key]['ui:options']);
+
+        // TODO 需要判断类型
+        if (properties[key].type === 'array') {
+          model[key] = this.formModel[key] || [];
+        } else {
+          model[key] = this.formModel[key] || '';
+        }
+        properties[key].lcComponentName = item.lcComponentName;
+      });
+      this.normalFormModel = model;
+      this.formModel = Object.assign(
+        {},
+        this.normalFormModel,
+        this.advanceFormModel,
+      );
+      this.normalSchema = {
+        required,
+        properties,
+      };
+      this.normalUiSchema = uiSchema;
+      this.$nextTick(() => {
+        this.appendKeyInfo('normal');
+      });
+    },
+    initAdvanceSchema() {
+      const required = [];
+      const properties = {};
+      const uiSchema = {};
+      const model = {};
+      this.advanceList.forEach((item) => {
+        const { key } = item;
+        if (item.required) {
+          required.push(key);
+        }
+
+        properties[key] = this.advanceSchema[key] || item.schema;
+        uiSchema[key] = this.advanceUiSchema[key] || item.uiSchema;
         // 处理 uiSchema.ui:options 类型赋值问题
         this.processUiSchemaKey(uiSchema[key]['ui:options']);
 
@@ -197,14 +264,19 @@ export default {
         properties[key].lcComponentName = item.lcComponentName;
       });
 
-      this.formModel = model;
-      this.formSchema = {
+      this.advanceFormModel = model;
+      this.formModel = Object.assign(
+        {},
+        this.normalFormModel,
+        this.advanceFormModel,
+      );
+      this.advanceSchema = {
         required,
         properties,
       };
-      this.formUiSchema = uiSchema;
+      this.advanceUiSchema = uiSchema;
       this.$nextTick(() => {
-        this.appendKeyInfo();
+        this.appendKeyInfo('advance');
       });
     },
     // 处理 uiSchema.ui:options 类型赋值问题
@@ -217,16 +289,27 @@ export default {
       });
     },
     // 添加默认key属性
-    appendKeyInfo() {
+    appendKeyInfo(operType) {
+      let list = null;
+      let fatherClass = '';
+      if (operType === 'normal') {
+        list = this.normalList;
+        fatherClass = 'el-query-filter__normal';
+      } else {
+        list = this.advanceList;
+        fatherClass = 'el-query-filter__advance';
+      }
+
       Array.from(
-        document.querySelectorAll('.drawingBoard .el-form-item'),
+        document.querySelectorAll(`.${fatherClass} .el-form-item`),
       ).forEach((dom, index) => {
         // if (!dom.innerHTML.includes('deleteOper')) {
         //   dom.innerHTML += '<i class="el-icon-delete deleteOper"><i>';
         // }
-        dom
-          .querySelector('label')
-          .setAttribute('data-key', this.drawingList[index].key);
+        const labelDom = dom.querySelector('label');
+        if (labelDom) {
+          labelDom.setAttribute('data-key', list[index].key);
+        }
       });
     },
     bindFindComponent(event) {
@@ -244,7 +327,7 @@ export default {
         key = event.target.querySelector('label').getAttribute('data-key');
       }
       if (key) {
-        const findObj = this.drawingList.find(item => item.key === key);
+        const findObj = this.normalList.concat(this.advanceList).find(item => item.key === key);
         if (findObj) {
           this.setActiveComponent(findObj);
           this.setActiveComponentClass(findObj);
@@ -280,67 +363,67 @@ export default {
       this.$emit('setActiveComponent', item);
     },
     setDefaultComponent() {
-      if (this.drawingList.length) {
-        this.setActiveComponent(this.drawingList[0]);
-        this.setActiveComponentClass(this.drawingList[0]);
+      if (this.normalList.length) {
+        this.setActiveComponent(this.normalList[0]);
+        this.setActiveComponentClass(this.normalList[0]);
       }
     },
     showSortDeleteDialog() {
       this.visible = true;
     },
-    empty() {
-      this.$confirm('确定要清空所有组件吗？', '提示', { type: 'warning' }).then(
-        () => {
-          saveIdGlobal(100);
-          this.drawingList = [];
-          this.setActiveComponent({});
-        },
-      );
-    },
-    generateCode(generateType) {
-      if (generateType === 'json') {
-        return getDataJson(this.formSchema, this.formUiSchema, this.formModel);
-      }
-      return generatVueCode(
-        this.formProps,
-        this.formSchema,
-        this.formUiSchema,
-        this.formModel,
-      );
-    },
-    copyCommand(name) {
-      this.copyType = name;
-      document.getElementById('copyNode').click();
-    },
-    upDownCommand(name) {
-      if (name === 'download') {
-        this.downloadCode();
-      } else {
-        document.getElementById('uploader').click();
-      }
-    },
-    downloadCode() {
-      const codeStr = this.generateCode();
-      const blob = new Blob([codeStr], { type: 'text/plain;charset=utf-8' });
-      saveAs(blob, 'LowCodeForm.vue');
-    },
-    async changeFile(e) {
-      const loading = this.$loading({
-        lock: true,
-        text: '渲染中...',
-        spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)',
-      });
+    // empty() {
+    //   this.$confirm('确定要清空所有组件吗？', '提示', { type: 'warning' }).then(
+    //     () => {
+    //       saveIdGlobal(100);
+    //       this.normalList = [];
+    //       this.setActiveComponent({});
+    //     },
+    //   );
+    // },
+    // generateCode(generateType) {
+    //   if (generateType === 'json') {
+    //     return getDataJson(this.formSchema, this.formUiSchema, this.formModel);
+    //   }
+    //   return generatVueCode(
+    //     this.formProps,
+    //     this.formSchema,
+    //     this.formUiSchema,
+    //     this.formModel,
+    //   );
+    // },
+    // copyCommand(name) {
+    //   this.copyType = name;
+    //   document.getElementById('copyNode').click();
+    // },
+    // upDownCommand(name) {
+    //   if (name === 'download') {
+    //     this.downloadCode();
+    //   } else {
+    //     document.getElementById('uploader').click();
+    //   }
+    // },
+    // downloadCode() {
+    //   const codeStr = this.generateCode();
+    //   const blob = new Blob([codeStr], { type: 'text/plain;charset=utf-8' });
+    //   saveAs(blob, 'LowCodeForm.vue');
+    // },
+    // async changeFile(e) {
+    //   const loading = this.$loading({
+    //     lock: true,
+    //     text: '渲染中...',
+    //     spinner: 'el-icon-loading',
+    //     background: 'rgba(0, 0, 0, 0.7)',
+    //   });
 
-      const { drawingList, formProps } = await importVueFile(e.target);
-      this.drawingList = drawingList;
-      this.$emit('changeFormProps', formProps);
-      document.getElementById('uploader').value = '';
-      setTimeout(() => {
-        this.setDefaultComponent();
-        loading.close();
-      }, 200);
-    },
+    //   const { normalList, formProps } = await importVueFile(e.target);
+    //   this.normalList = normalList;
+    //   this.$emit('changeFormProps', formProps);
+    //   document.getElementById('uploader').value = '';
+    //   setTimeout(() => {
+    //     this.setDefaultComponent();
+    //     loading.close();
+    //   }, 200);
+    // },
   },
 };
 </script>
@@ -373,7 +456,6 @@ export default {
   }
   .drawingBoard {
     height: 100%;
-    min-height: 300px;
     padding: 20px;
     overflow-x: hidden;
   }

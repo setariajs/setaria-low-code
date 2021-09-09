@@ -401,12 +401,12 @@ export const selectComponents = [
   },
 ];
 // 表单属性
-export const formProps = {
+export const formFormProps = {
   inline: false,
   disabled: false,
   'label-position': '',
-  'label-width': '100px',
-  'label-suffix': ':',
+  'label-width': 'auto',
+  'label-suffix': '：',
   size: '',
   columns: '',
   'validate-on-rule-change': true,
@@ -414,9 +414,24 @@ export const formProps = {
   'show-message': true,
 };
 
+export const tableFormProps = {
+  // inline: false,
+  disabled: false,
+  'label-position': 'top',
+  'label-width': 'auto',
+  'label-suffix': '：',
+  size: 'small',
+  columns: '4',
+  'validate-on-rule-change': true,
+  'column-max-label-length': undefined,
+  'show-message': true,
+  'show-result': true,
+};
+
 export default {
   inputComponents,
   selectComponents,
-  formProps,
+  formFormProps,
+  tableFormProps,
   oneOfTureFalse,
 };

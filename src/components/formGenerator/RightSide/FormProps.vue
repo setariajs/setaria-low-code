@@ -15,7 +15,7 @@
 
 <script>
 
-import { oneOfTureFalse, formProps } from '@/components/formGenerator/components';
+import { oneOfTureFalse, formFormProps } from '@/components/formGenerator/components';
 
 // const oneOfTureFalse = [
 //   { const: false, title: '否' },
@@ -23,6 +23,11 @@ import { oneOfTureFalse, formProps } from '@/components/formGenerator/components
 // ];
 export default {
   components: {},
+  inject: {
+    generatorType: {
+      default: 'form',
+    },
+  },
   props: {
     activeComponent: {
       type: Object,
@@ -30,69 +35,12 @@ export default {
     },
     value: {
       type: Object,
-      default: () => formProps,
+      default: () => formFormProps,
     },
   },
   data() {
     return {
-      schema: {
-        properties: {
-          'label-position': {
-            type: 'string',
-            title: '标签位置',
-            oneOf: [
-              { const: 'right', title: '右边' },
-              { const: 'left', title: '左边' },
-              { const: 'top', title: '上边' },
-            ],
-          },
-          'label-width': {
-            type: 'string',
-            title: '标签宽度',
-          },
-          'label-suffix': {
-            type: 'string',
-            title: '标签后缀',
-          },
-          'column-max-label-length': {
-            type: 'string',
-            title: '标签省略数量',
-          },
-          columns: {
-            type: 'string',
-            title: '列数',
-          },
-          size: {
-            type: 'string',
-            title: '尺寸',
-            oneOf: [
-              { const: 'medium', title: 'medium' },
-              { const: 'small', title: 'small' },
-              { const: 'mini', title: 'mini' },
-            ],
-          },
-          inline: {
-            type: 'boolean',
-            title: '行内模式',
-            oneOf: oneOfTureFalse,
-          },
-          disabled: {
-            type: 'boolean',
-            title: '表单禁用',
-            oneOf: oneOfTureFalse,
-          },
-          'validate-on-rule-change': {
-            type: 'boolean',
-            title: 'rules变更校验',
-            oneOf: oneOfTureFalse,
-          },
-          'show-message': {
-            type: 'boolean',
-            title: '显示校验错误信息',
-            oneOf: oneOfTureFalse,
-          },
-        },
-      },
+      // schema:
       uiSchema: {
         inline: {
           'ui:widget': 'select',
@@ -130,8 +78,87 @@ export default {
             clearable: true,
           },
         },
+        'show-result': {
+          'ui:widget': 'select',
+          'ui:options': {
+            clearable: true,
+          },
+        },
       },
     };
+  },
+  computed: {
+    schema() {
+      const properties = {
+        'label-position': {
+          type: 'string',
+          title: '标签位置',
+          oneOf: [
+            { const: 'right', title: '右边' },
+            { const: 'left', title: '左边' },
+            { const: 'top', title: '上边' },
+          ],
+        },
+        'label-width': {
+          type: 'string',
+          title: '标签宽度',
+        },
+        'label-suffix': {
+          type: 'string',
+          title: '标签后缀',
+        },
+        'column-max-label-length': {
+          type: 'string',
+          title: '标签省略数量',
+        },
+        columns: {
+          type: 'string',
+          title: '列数',
+        },
+        size: {
+          type: 'string',
+          title: '尺寸',
+          oneOf: [
+            { const: 'medium', title: 'medium' },
+            { const: 'small', title: 'small' },
+            { const: 'mini', title: 'mini' },
+          ],
+        },
+        'show-result': {
+          type: 'boolean',
+          title: '显示快捷搜索',
+          oneOf: oneOfTureFalse,
+        },
+        inline: {
+          type: 'boolean',
+          title: '行内模式',
+          oneOf: oneOfTureFalse,
+        },
+        disabled: {
+          type: 'boolean',
+          title: '表单禁用',
+          oneOf: oneOfTureFalse,
+        },
+        'validate-on-rule-change': {
+          type: 'boolean',
+          title: 'rules变更校验',
+          oneOf: oneOfTureFalse,
+        },
+        'show-message': {
+          type: 'boolean',
+          title: '显示校验错误信息',
+          oneOf: oneOfTureFalse,
+        },
+      };
+      if (this.generatorType === 'table') {
+        delete properties.inline;
+      } else if (this.generatorType === 'form') {
+        delete properties['show-result'];
+      }
+      return {
+        properties,
+      };
+    },
   },
 };
 </script>
