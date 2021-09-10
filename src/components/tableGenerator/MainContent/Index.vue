@@ -9,9 +9,9 @@
       <div class="rightArea">
         <!-- <el-button type="text"
           icon="el-icon-s-operation"
-          @click="showSortDeleteDialog">排序&删除</el-button>
+          @click="showSortDeleteDialog">排序&删除</el-button> -->
 
-        <el-dropdown @command="upDownCommand">
+        <!-- <el-dropdown @command="upDownCommand">
           <el-button type="text"
             icon="el-icon-sort"
             class="copyBtn">上传/下载Vue文件</el-button>
@@ -19,10 +19,10 @@
             <el-dropdown-item command="uplaod">上传Vue文件</el-dropdown-item>
             <el-dropdown-item command="download">下载Vue文件</el-dropdown-item>
           </el-dropdown-menu>
-        </el-dropdown>
+        </el-dropdown> -->
 
 
-        <el-dropdown @command="copyCommand">
+        <!-- <el-dropdown @command="copyCommand">
           <el-button type="text"
             icon="el-icon-document-copy"
             class="copyBtn">复制</el-button>
@@ -30,12 +30,21 @@
             <el-dropdown-item command="all">复制完整代码</el-dropdown-item>
             <el-dropdown-item command="json">复制Json代码</el-dropdown-item>
           </el-dropdown-menu>
-        </el-dropdown>
+        </el-dropdown> -->
 
-        <el-button type="text"
-          icon="el-icon-delete"
-          @click="empty"
-          class="dangerText">清空</el-button> -->
+
+         <!-- <el-dropdown @command="clearCommand">
+          <el-button type="text"
+            icon="el-icon-delete"
+            class="copyBtn">清空</el-button>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item command="all">清空所有</el-dropdown-item>
+            <el-dropdown-item command="json">清空普通搜索</el-dropdown-item>
+            <el-dropdown-item command="json">清空高级搜索</el-dropdown-item>
+            <el-dropdown-item command="json">清空表格</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown> -->
+
       </div>
     </div>
 
@@ -56,8 +65,10 @@
           :advance-schema="advanceSchema"
           :advance-ui-schema="advanceUiSchema">
         </el-query-filter>
-
       </el-card>
+
+      <table-card :tableList="tableList" />
+
 
       <!-- <draggable
         draggable=".el-col"
@@ -74,7 +85,7 @@
 
       </draggable> -->
 
-      <div v-show="!normalList.length"
+      <div v-show="!normalList.length && !advanceList.length && !tableList.length"
         class="emptyInfo">
         从左侧点选组件进行表单设计
       </div>
@@ -94,6 +105,7 @@
 </template>
 
 <script>
+import TableCard from './TableCard.vue';
 // import draggable from 'vuedraggable';
 // import ClipboardJS from 'clipboard';
 // import { saveAs } from 'file-saver';
@@ -110,7 +122,12 @@ function hasClass(target, key) {
 }
 // TODO 增加顶部相关按钮
 export default {
-  components: {},
+  components: { TableCard },
+  inject: {
+    generatorType: {
+      default: 'form',
+    },
+  },
   props: {
     // normalList: {
     //   type: Array,
@@ -134,6 +151,7 @@ export default {
       copyType: '',
       normalList: [],
       advanceList: [],
+      tableList: [],
     };
   },
   mounted() {
@@ -187,18 +205,21 @@ export default {
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)',
       });
+      if (this.generatorType === 'form') {
+        if (type === 'normal') {
+          this.normalList.push(item);
+        } else if (type === 'advance') {
+          this.advanceList.push(item);
+        }
 
-      if (type === 'normal') {
-        this.normalList.push(item);
-      } else if (type === 'advance') {
-        this.advanceList.push(item);
+        this.setActiveComponent(item);
+        setTimeout(() => {
+          this.setActiveComponentClass(item);
+          loading.close();
+        }, 200);
+      } else if (this.generatorType === 'table') {
+        this.tableList.push(item);
       }
-
-      // this.setActiveComponent(item);
-      setTimeout(() => {
-        //   this.setActiveComponentClass(item);
-        loading.close();
-      }, 200);
     },
     initNormalSchema() {
       const required = [];
@@ -432,7 +453,7 @@ export default {
 .mainContentContainer {
   .topArea {
     border-bottom: 1px solid #e3e3e3;
-    padding: 0 20px;
+    margin: 20px;
     display: flex;
     justify-content: space-between;
     .leftArea {

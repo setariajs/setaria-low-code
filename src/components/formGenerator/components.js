@@ -400,6 +400,8 @@ export const selectComponents = [
     },
   },
 ];
+
+
 // 表单属性
 export const formFormProps = {
   inline: false,
@@ -413,7 +415,7 @@ export const formFormProps = {
   'column-max-label-length': undefined,
   'show-message': true,
 };
-
+// 表格搜索表单属性
 export const tableFormProps = {
   // inline: false,
   disabled: false,
@@ -427,11 +429,18 @@ export const tableFormProps = {
   'show-message': true,
   'show-result': true,
 };
+// 表格列属性
+export const tableColumnProps = {
+  key: '',
+  title: '',
+  type: 'string',
+};
 
 export default {
   inputComponents,
   selectComponents,
   formFormProps,
+  tableColumnProps,
   tableFormProps,
   oneOfTureFalse,
 };

@@ -35,7 +35,6 @@ export default {
   mounted() {},
   methods: {
     addComponent(item, type) {
-      console.log(item, type);
       this.$refs.mainCotent.addComponent(item, type);
     },
     setActiveComponent(item) {

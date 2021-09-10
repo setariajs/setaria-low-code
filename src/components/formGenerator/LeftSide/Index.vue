@@ -10,6 +10,8 @@
       <component-group @add="addComponent"
         :title="'选择型组件'"
         :components="selectComponents" />
+      <table-component-group @add="addComponent" v-if="generatorType === 'table'"
+        :title="'表格组件'"/>
     </el-scrollbar>
 
   </div>
@@ -18,9 +20,15 @@
 <script>
 import { inputComponents, selectComponents } from '../components';
 import ComponentGroup from './ComponentGroup.vue';
+import TableComponentGroup from './TableComponentGroup.vue';
 
 export default {
-  components: { ComponentGroup },
+  components: { ComponentGroup, TableComponentGroup },
+  inject: {
+    generatorType: {
+      default: 'form',
+    },
+  },
   data() {
     return {
       inputComponents,
