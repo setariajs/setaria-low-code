@@ -21,7 +21,6 @@
           </el-dropdown-menu>
         </el-dropdown> -->
 
-
         <!-- <el-dropdown @command="copyCommand">
           <el-button type="text"
             icon="el-icon-document-copy"
@@ -32,18 +31,17 @@
           </el-dropdown-menu>
         </el-dropdown> -->
 
-
-         <!-- <el-dropdown @command="clearCommand">
+        <el-dropdown @command="clearCommand">
           <el-button type="text"
             icon="el-icon-delete"
             class="copyBtn">清空</el-button>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item command="all">清空所有</el-dropdown-item>
-            <el-dropdown-item command="json">清空普通搜索</el-dropdown-item>
-            <el-dropdown-item command="json">清空高级搜索</el-dropdown-item>
-            <el-dropdown-item command="json">清空表格</el-dropdown-item>
+            <el-dropdown-item command="normal">清空普通搜索</el-dropdown-item>
+            <el-dropdown-item command="advance">清空高级搜索</el-dropdown-item>
+            <el-dropdown-item command="table">清空表格</el-dropdown-item>
           </el-dropdown-menu>
-        </el-dropdown> -->
+        </el-dropdown>
 
       </div>
     </div>
@@ -67,8 +65,7 @@
         </el-query-filter>
       </el-card>
 
-      <table-card :tableList="tableList" />
-
+      <table-card ref="tableCard" :tableList="tableList" @setActiveComponent="setActiveComponent" />
 
       <!-- <draggable
         draggable=".el-col"
@@ -85,10 +82,10 @@
 
       </draggable> -->
 
-      <div v-show="!normalList.length && !advanceList.length && !tableList.length"
+      <!-- <div v-show="!normalList.length && !advanceList.length && !tableList.length"
         class="emptyInfo">
         从左侧点选组件进行表单设计
-      </div>
+      </div> -->
     </el-scrollbar>
     <!-- <input id="copyNode"
       type="hidden">
@@ -115,7 +112,7 @@ import TableCard from './TableCard.vue';
 //   getDataJson,
 //   importVueFile,
 // } from '@/utils/formGenerator';
-// import { saveIdGlobal } from '@/utils/db';
+import { saveIdGlobal } from '@/utils/db';
 
 function hasClass(target, key) {
   return Array.from(target.classList).includes(key);
@@ -205,7 +202,7 @@ export default {
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)',
       });
-      if (this.generatorType === 'form') {
+      if (type === 'normal' || type === 'advance') {
         if (type === 'normal') {
           this.normalList.push(item);
         } else if (type === 'advance') {
@@ -217,8 +214,12 @@ export default {
           this.setActiveComponentClass(item);
           loading.close();
         }, 200);
-      } else if (this.generatorType === 'table') {
+      } else {
         this.tableList.push(item);
+        setTimeout(() => {
+          this.$refs.tableCard.setActiveComponent(item);
+          loading.close();
+        }, 200);
       }
     },
     initNormalSchema() {
@@ -255,6 +256,12 @@ export default {
         required,
         properties,
       };
+      // } else {
+      //   this.normalSchema = {
+      //      required,
+      //     properties,
+      //   };
+      // }
       this.normalUiSchema = uiSchema;
       this.$nextTick(() => {
         this.appendKeyInfo('normal');
@@ -320,18 +327,19 @@ export default {
         list = this.advanceList;
         fatherClass = 'el-query-filter__advance';
       }
-
-      Array.from(
-        document.querySelectorAll(`.${fatherClass} .el-form-item`),
-      ).forEach((dom, index) => {
+      if (list.length) {
+        Array.from(
+          document.querySelectorAll(`.${fatherClass} .el-form-item`),
+        ).forEach((dom, index) => {
         // if (!dom.innerHTML.includes('deleteOper')) {
         //   dom.innerHTML += '<i class="el-icon-delete deleteOper"><i>';
         // }
-        const labelDom = dom.querySelector('label');
-        if (labelDom) {
-          labelDom.setAttribute('data-key', list[index].key);
-        }
-      });
+          const labelDom = dom.querySelector('label');
+          if (labelDom) {
+            labelDom.setAttribute('data-key', list[index].key);
+          }
+        });
+      }
     },
     bindFindComponent(event) {
       let key = '';
@@ -348,7 +356,9 @@ export default {
         key = event.target.querySelector('label').getAttribute('data-key');
       }
       if (key) {
-        const findObj = this.normalList.concat(this.advanceList).find(item => item.key === key);
+        const findObj = this.normalList
+          .concat(this.advanceList)
+          .find(item => item.key === key);
         if (findObj) {
           this.setActiveComponent(findObj);
           this.setActiveComponentClass(findObj);
@@ -376,12 +386,12 @@ export default {
       }
       if (findObj) {
         findObj.classList.add('selected');
-      } else {
+      } else if (array.length) {
         array[array.length - 1].classList.add('selected');
       }
     },
-    setActiveComponent(item) {
-      this.$emit('setActiveComponent', item);
+    setActiveComponent(item, type = 'formItem') {
+      this.$emit('setActiveComponent', item, type);
     },
     setDefaultComponent() {
       if (this.normalList.length) {
@@ -392,15 +402,40 @@ export default {
     showSortDeleteDialog() {
       this.visible = true;
     },
-    // empty() {
-    //   this.$confirm('确定要清空所有组件吗？', '提示', { type: 'warning' }).then(
-    //     () => {
-    //       saveIdGlobal(100);
-    //       this.normalList = [];
-    //       this.setActiveComponent({});
-    //     },
-    //   );
-    // },
+    clearCommand(name) {
+      let msg = '';
+      if (name === 'all') {
+        msg = '确定要清空所有组件吗？';
+      } else if (name === 'normal') {
+        msg = '确定要清空普通搜索吗？';
+      } else if (name === 'advance') {
+        msg = '确定要清空高级搜索吗？';
+      } else if (name === 'table') {
+        msg = '确定要清空表格吗？';
+      }
+
+      this.$confirm(msg, '提示', { type: 'warning' }).then(
+        () => {
+          if (name === 'all') {
+            saveIdGlobal(100);
+            this.normalList = [];
+            this.advanceList = [];
+            this.tableList = [];
+            this.$refs.tableCard.clear();
+            this.setActiveComponent({});
+          } else if (name === 'normal') {
+            this.normalList = [];
+            this.setActiveComponent({});
+          } else if (name === 'advance') {
+            this.advanceList = [];
+            this.setActiveComponent({});
+          } else if (name === 'table') {
+            this.tableList = [];
+            this.$refs.tableCard.clear();
+          }
+        },
+      );
+    },
     // generateCode(generateType) {
     //   if (generateType === 'json') {
     //     return getDataJson(this.formSchema, this.formUiSchema, this.formModel);
@@ -453,8 +488,8 @@ export default {
 .mainContentContainer {
   .topArea {
     border-bottom: 1px solid #e3e3e3;
-    margin: 20px;
     display: flex;
+    padding: 0 20px;
     justify-content: space-between;
     .leftArea {
     }
@@ -477,7 +512,7 @@ export default {
   }
   .drawingBoard {
     height: 100%;
-    padding: 20px;
+    margin: 10px 20px;
     overflow-x: hidden;
   }
   .emptyInfo {
@@ -491,25 +526,6 @@ export default {
     letter-spacing: 4px;
   }
   /deep/ .el-form-item {
-    // position: relative;
-    // .deleteOper {
-    //   content: "\E6D7";
-    //   display: none;
-    //   font-family: element-icons !important;
-    //   border-radius: 50%;
-    //   border: 1px solid #f44336;
-    //   color: #f44336;
-    //   font-size: 12px;
-    //   width: 16px;
-    //   height: 16px;
-    //   text-align: center;
-    //   line-height: 15px;
-    //   padding-left: 1px;
-    //   cursor: pointer;
-    //   position: absolute;
-    //   bottom: 0;
-    //   right: 5px;
-    // }
     &:hover {
       background: #fcf3ff;
       .deleteOper {

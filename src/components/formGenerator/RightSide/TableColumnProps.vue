@@ -44,6 +44,7 @@ export default {
     return {
       // schema:
       schema: {
+        required: ['title', 'key', 'type'],
         properties: {
           key: {
             type: 'string',
@@ -64,6 +65,22 @@ export default {
               { const: 'array', title: '数组' },
             ],
           },
+          'ui:options.width': {
+            type: 'string',
+            title: '宽度',
+          },
+          'ui:options.minWidth': {
+            type: 'string',
+            title: '最小宽度',
+          },
+          'ui:options.fixed': {
+            type: 'string',
+            title: '固定位置',
+            oneOf: [
+              { const: 'left', title: '左边' },
+              { const: 'right', title: '右边' },
+            ],
+          },
           // fixed: {},
           // width: {},
           // minWidth: {},
@@ -73,10 +90,21 @@ export default {
         key: {},
         title: {},
         type: [],
+        'ui:options.width': {},
+        'ui:options.minWidth': {},
+        'ui:options.fixed': {
+          'ui:options': {
+            clearable: true,
+          },
+
+        },
       },
     };
   },
-  computed: {
+  methods: {
+    validate() {
+      return this.$refs.form.validate();
+    },
   },
 };
 </script>

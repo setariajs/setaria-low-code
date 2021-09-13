@@ -6,6 +6,9 @@
         name="components" />
       <el-tab-pane label="表单属性"
         name="form" />
+      <el-tab-pane label="表字段属性"
+        v-if="generatorType === 'table'"
+        name="tableColumn" />
     </el-tabs>
     <el-scrollbar>
 
@@ -15,6 +18,9 @@
       <form-props v-show="tabeActive ==='form'"
         v-model="formProps" />
 
+      <table-column-props v-show="tabeActive ==='tableColumn'"
+        v-model="tableColumnProps" />
+
     </el-scrollbar>
   </div>
 </template>
@@ -22,15 +28,25 @@
 <script>
 import FormProps from './FormProps.vue';
 import ComponentProps from './ComponentProps.vue';
+import TableColumnProps from './TableColumnProps.vue';
 
 export default {
-  components: { FormProps, ComponentProps },
+  components: { FormProps, ComponentProps, TableColumnProps },
+  inject: {
+    generatorType: {
+      default: 'form',
+    },
+  },
   props: {
     activeComponent: {
       type: Object,
       default: () => {},
     },
     formProps: {
+      type: Object,
+      default: () => {},
+    },
+    tableColumnProps: {
       type: Object,
       default: () => {},
     },
@@ -54,12 +70,5 @@ export default {
       overflow-x: hidden;
     }
   }
-  // /deep/ {
-  //   .el-tabs,
-  //   .el-tabs__content,
-  //   .el-tab-pane {
-  //     height: calc(100% - 40px);
-  //   }
-  // }
 }
 </style>

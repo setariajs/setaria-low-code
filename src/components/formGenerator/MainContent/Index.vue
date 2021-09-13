@@ -277,7 +277,7 @@ export default {
       }
     },
     setActiveComponent(item) {
-      this.$emit('setActiveComponent', item);
+      this.$emit('setActiveComponent', item, 'formItem');
     },
     setDefaultComponent() {
       if (this.drawingList.length) {

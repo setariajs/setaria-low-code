@@ -7785,10 +7785,10 @@ set-value@^2.0.0, set-value@^2.0.1:
     is-plain-object "^2.0.3"
     split-string "^3.0.1"
 
-setaria-ui@^1.7.7:
-  version "1.7.7"
-  resolved "https://registry.yarnpkg.com/setaria-ui/-/setaria-ui-1.7.7.tgz#b7a9922a91f888d612637717daf5c7a52ae91af2"
-  integrity sha512-NgGOQuPENeKKEMzvHim7Qysw09RIEpXkgyYSyNCTAneeWLVPkeA3edMJ/zqd6sX13SmHOo6732mBWjxAZeCOjA==
+setaria-ui@^1.7.11:
+  version "1.7.11"
+  resolved "https://registry.yarnpkg.com/setaria-ui/-/setaria-ui-1.7.11.tgz#e7d2d847e43015773deb64dcc452c8eb106fcdf6"
+  integrity sha512-KO0uVQszvspwPrRSvNFUH0A4u2DvB+MAqUTGVkQNLKpO7EIx3GFbf1J5Nsn9U/Wsg/fVu1V3+8MdD4MZFtWCNQ==
   dependencies:
     async-validator "~1.8.1"
     babel-helper-vue-jsx-merge-props "^2.0.0"

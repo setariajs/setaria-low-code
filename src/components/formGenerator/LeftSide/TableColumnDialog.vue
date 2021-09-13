@@ -4,7 +4,7 @@
     width="30%"
     title="添加"
     :visible.sync="innerVisible">
-      <table-column-props v-model="value"/>
+      <table-column-props v-model="value" ref="tableColumnProps"/>
 
     <div slot="footer">
        <el-button type="primary"
@@ -45,8 +45,10 @@ export default {
   },
   mounted() {},
   methods: {
-    submit() {
+    async submit() {
+      await this.$refs.tableColumnProps.validate();
       this.$emit('submit', this.value);
+      this.innerVisible = false;
     },
   },
 };

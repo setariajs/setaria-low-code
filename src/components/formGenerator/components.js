@@ -434,6 +434,10 @@ export const tableColumnProps = {
   key: '',
   title: '',
   type: 'string',
+  'ui:options.width': '',
+  'ui:options.minWidth': '',
+  'ui:options.fixed': '',
+
 };
 
 export default {
