@@ -1,23 +1,22 @@
 <template>
 
-  <el-dialog class="sortDeleteDialog"
-    width="30%"
+  <el-dialog class="sortDeleteTableColumnDialog"
+    width="60%"
     title="排序&删除"
     :visible.sync="innerVisible">
-    <draggable :list="value"
+
+    <draggable class="formDraggable"
+      :list="list"
       :animation="340"
       group="componentsGroup">
       <div class="item"
-        v-for="(item,index) in value"
+        v-for="(item,index) in list"
         :key="index">
-        <span>{{item.schema.title}} —— {{item.key}}</span>
-        <i class="el-icon-delete deleteItem" @click="deleteItem(index)"></i>
+        <span>{{item.title}} —— {{item.key}}</span>
+        <i class="el-icon-delete deleteItem"
+          @click="deleteItem(index)"></i>
       </div>
     </draggable>
-      <div v-show="!value.length"
-        class="emptyInfo">
-       暂无组件
-      </div>
 
     <div slot="footer">
       <el-button-group class="dialog-bt-group">
@@ -37,9 +36,9 @@ export default {
       type: Boolean,
       default: false,
     },
-    value: {
-      type: Object,
-      default: () => ({}),
+    list: {
+      type: Array,
+      default: () => [],
     },
   },
   data() {
@@ -58,14 +57,14 @@ export default {
   mounted() {},
   methods: {
     deleteItem(index) {
-      this.value.splice(index, 1);
+      this.list.splice(index, 1);
       this.$emit('delete');
     },
   },
 };
 </script>
 <style  scoped lang="scss">
-.sortDeleteDialog {
+.sortDeleteTableColumnDialog {
   .item {
     padding: 10px;
     margin: 10px;
@@ -89,8 +88,8 @@ export default {
       cursor: pointer;
     }
   }
-  .emptyInfo{
-          text-align: center;
+  .emptyInfo {
+    text-align: center;
     font-size: 18px;
     color: #ccb1ea;
     letter-spacing: 4px;

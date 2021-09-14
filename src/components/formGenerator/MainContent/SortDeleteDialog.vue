@@ -36,8 +36,8 @@ export default {
       default: false,
     },
     value: {
-      type: Object,
-      default: () => ({}),
+      type: Array,
+      default: () => ([]),
     },
   },
   data() {

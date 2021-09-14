@@ -68,26 +68,6 @@ export default {
           this.setActiveComponent(findObject);
         }
       }
-      // // if (event.target.nodeName.toLowerCase() === 'label') {
-      // //   key = event.target.getAttribute('for');
-      // // } else
-      // if (labelNode) {
-      //   key = labelNode.getAttribute('data-key');
-      // } else if (
-      //   hasClass(event.target, 'el-col')
-      //   || hasClass(event.target, 'el-form-item')
-      // ) {
-      //   key = event.target.querySelector('label').getAttribute('data-key');
-      // }
-      // if (key) {
-      //   const findObj = this.normalList
-      //     .concat(this.advanceList)
-      //     .find(item => item.key === key);
-      //   if (findObj) {
-      //     this.setActiveComponent(findObj);
-      //     this.setActiveComponentClass(findObj);
-      //   }
-      // }
     },
     setActiveComponent(selectItem) {
       const array = Array.from(

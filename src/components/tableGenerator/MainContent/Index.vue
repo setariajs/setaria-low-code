@@ -7,14 +7,24 @@
           @click="$router.push('/')">前往表单设计器</el-button>
       </div>
       <div class="rightArea">
+
+        <el-dropdown @command="sortDeleteCommand">
+          <el-button type="text"
+            icon="el-icon-s-operation"
+            class="commonBtn">排序&删除</el-button>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item command="formItem">表单</el-dropdown-item>
+            <el-dropdown-item command="tableColumn">表格</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
         <!-- <el-button type="text"
           icon="el-icon-s-operation"
-          @click="showSortDeleteDialog">排序&删除</el-button> -->
+          @click="showSortDeleteDialog"></el-button> -->
 
         <!-- <el-dropdown @command="upDownCommand">
           <el-button type="text"
             icon="el-icon-sort"
-            class="copyBtn">上传/下载Vue文件</el-button>
+            class="commonBtn">上传/下载Vue文件</el-button>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item command="uplaod">上传Vue文件</el-dropdown-item>
             <el-dropdown-item command="download">下载Vue文件</el-dropdown-item>
@@ -24,7 +34,7 @@
         <!-- <el-dropdown @command="copyCommand">
           <el-button type="text"
             icon="el-icon-document-copy"
-            class="copyBtn">复制</el-button>
+            class="commonBtn">复制</el-button>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item command="all">复制完整代码</el-dropdown-item>
             <el-dropdown-item command="json">复制Json代码</el-dropdown-item>
@@ -34,7 +44,7 @@
         <el-dropdown @command="clearCommand">
           <el-button type="text"
             icon="el-icon-delete"
-            class="copyBtn">清空</el-button>
+            class="commonBtn">清空</el-button>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item command="all">清空所有</el-dropdown-item>
             <el-dropdown-item command="normal">清空普通搜索</el-dropdown-item>
@@ -65,27 +75,10 @@
         </el-query-filter>
       </el-card>
 
-      <table-card ref="tableCard" :tableList="tableList" @setActiveComponent="setActiveComponent" />
+      <table-card ref="tableCard"
+        :tableList="tableList"
+        @setActiveComponent="setActiveComponent" />
 
-      <!-- <draggable
-        draggable=".el-col"
-        :list="normalList"
-        :animation="340"
-        group="componentsGroup">
-        <el-json-form ref="form"
-          v-bind="formProps"
-          :model="formModel"
-          :schema="formSchema"
-          :ui-schema="formUiSchema"
-          :rules="rules">
-        </el-json-form>
-
-      </draggable> -->
-
-      <!-- <div v-show="!normalList.length && !advanceList.length && !tableList.length"
-        class="emptyInfo">
-        从左侧点选组件进行表单设计
-      </div> -->
     </el-scrollbar>
     <!-- <input id="copyNode"
       type="hidden">
@@ -94,9 +87,15 @@
       id="uploader"
       @change="changeFile"
       style="display:none;" /> -->
-    <!-- <sort-delete-dialog :visible.sync="visible"
-        v-model="normalList"
-        @delete="setDefaultComponent" /> -->
+    <sort-delete-form-item-dialog :visible.sync="formItemVisible"
+      :normalList="normalList"
+      :advanceList="advanceList"
+      @delete="setDefaultComponent"
+      @draggerEnd="setDefaultComponent" />
+
+    <sort-delete-table-column-dialog :visible.sync="tableColumnVisible"
+      :list="tableList"
+      @delete="setDefaultComponentByTableColumn" />
 
   </div>
 </template>
@@ -106,7 +105,9 @@ import TableCard from './TableCard.vue';
 // import draggable from 'vuedraggable';
 // import ClipboardJS from 'clipboard';
 // import { saveAs } from 'file-saver';
-// import SortDeleteDialog from './SortDeleteDialog.vue';
+import SortDeleteFormItemDialog from './SortDeleteFormItemDialog.vue';
+import SortDeleteTableColumnDialog from './SortDeleteTableColumnDialog.vue';
+
 // import {
 //   generatVueCode,
 //   getDataJson,
@@ -119,7 +120,11 @@ function hasClass(target, key) {
 }
 // TODO 增加顶部相关按钮
 export default {
-  components: { TableCard },
+  components: {
+    TableCard,
+    SortDeleteFormItemDialog,
+    SortDeleteTableColumnDialog,
+  },
   inject: {
     generatorType: {
       default: 'form',
@@ -144,7 +149,8 @@ export default {
       advanceFormModel: {},
       advanceSchema: {},
       advanceUiSchema: {},
-      visible: false,
+      tableColumnVisible: false,
+      formItemVisible: false,
       copyType: '',
       normalList: [],
       advanceList: [],
@@ -331,9 +337,9 @@ export default {
         Array.from(
           document.querySelectorAll(`.${fatherClass} .el-form-item`),
         ).forEach((dom, index) => {
-        // if (!dom.innerHTML.includes('deleteOper')) {
-        //   dom.innerHTML += '<i class="el-icon-delete deleteOper"><i>';
-        // }
+          // if (!dom.innerHTML.includes('deleteOper')) {
+          //   dom.innerHTML += '<i class="el-icon-delete deleteOper"><i>';
+          // }
           const labelDom = dom.querySelector('label');
           if (labelDom) {
             labelDom.setAttribute('data-key', list[index].key);
@@ -397,10 +403,17 @@ export default {
       if (this.normalList.length) {
         this.setActiveComponent(this.normalList[0]);
         this.setActiveComponentClass(this.normalList[0]);
+      } else if (this.advanceList.length) {
+        this.setActiveComponent(this.advanceList[0]);
+        this.setActiveComponentClass(this.advanceList[0]);
       }
     },
-    showSortDeleteDialog() {
-      this.visible = true;
+    setDefaultComponentByTableColumn() {
+      if (this.tableList.length) {
+        this.$nextTick(() => {
+          this.$refs.tableCard.setActiveComponent(this.tableList[0]);
+        });
+      }
     },
     clearCommand(name) {
       let msg = '';
@@ -414,27 +427,32 @@ export default {
         msg = '确定要清空表格吗？';
       }
 
-      this.$confirm(msg, '提示', { type: 'warning' }).then(
-        () => {
-          if (name === 'all') {
-            saveIdGlobal(100);
-            this.normalList = [];
-            this.advanceList = [];
-            this.tableList = [];
-            this.$refs.tableCard.clear();
-            this.setActiveComponent({});
-          } else if (name === 'normal') {
-            this.normalList = [];
-            this.setActiveComponent({});
-          } else if (name === 'advance') {
-            this.advanceList = [];
-            this.setActiveComponent({});
-          } else if (name === 'table') {
-            this.tableList = [];
-            this.$refs.tableCard.clear();
-          }
-        },
-      );
+      this.$confirm(msg, '提示', { type: 'warning' }).then(() => {
+        if (name === 'all') {
+          saveIdGlobal(100);
+          this.normalList = [];
+          this.advanceList = [];
+          this.tableList = [];
+          this.$refs.tableCard.clear();
+          this.setActiveComponent({});
+        } else if (name === 'normal') {
+          this.normalList = [];
+          this.setActiveComponent({});
+        } else if (name === 'advance') {
+          this.advanceList = [];
+          this.setActiveComponent({});
+        } else if (name === 'table') {
+          this.tableList = [];
+          this.$refs.tableCard.clear();
+        }
+      });
+    },
+    sortDeleteCommand(name) {
+      if (name === 'formItem') {
+        this.formItemVisible = true;
+      } else {
+        this.tableColumnVisible = true;
+      }
     },
     // generateCode(generateType) {
     //   if (generateType === 'json') {
@@ -498,7 +516,7 @@ export default {
       .dangerText {
         color: #f56c6c;
       }
-      .copyBtn {
+      .commonBtn {
         margin: 0 7px;
       }
     }
