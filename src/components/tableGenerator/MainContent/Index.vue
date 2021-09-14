@@ -17,11 +17,8 @@
             <el-dropdown-item command="tableColumn">表格</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <!-- <el-button type="text"
-          icon="el-icon-s-operation"
-          @click="showSortDeleteDialog"></el-button> -->
 
-        <!-- <el-dropdown @command="upDownCommand">
+        <el-dropdown @command="upDownCommand">
           <el-button type="text"
             icon="el-icon-sort"
             class="commonBtn">上传/下载Vue文件</el-button>
@@ -29,17 +26,18 @@
             <el-dropdown-item command="uplaod">上传Vue文件</el-dropdown-item>
             <el-dropdown-item command="download">下载Vue文件</el-dropdown-item>
           </el-dropdown-menu>
-        </el-dropdown> -->
+        </el-dropdown>
 
-        <!-- <el-dropdown @command="copyCommand">
+        <el-dropdown @command="copyCommand">
           <el-button type="text"
             icon="el-icon-document-copy"
             class="commonBtn">复制</el-button>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item command="all">复制完整代码</el-dropdown-item>
-            <el-dropdown-item command="json">复制Json代码</el-dropdown-item>
+            <el-dropdown-item command="form">复制表单Json代码</el-dropdown-item>
+            <el-dropdown-item command="table">复制表格Json代码</el-dropdown-item>
           </el-dropdown-menu>
-        </el-dropdown> -->
+        </el-dropdown>
 
         <el-dropdown @command="clearCommand">
           <el-button type="text"
@@ -80,13 +78,15 @@
         @setActiveComponent="setActiveComponent" />
 
     </el-scrollbar>
-    <!-- <input id="copyNode"
+
+    <input id="copyNode"
       type="hidden">
     <input type="file"
       accept=".vue"
       id="uploader"
       @change="changeFile"
-      style="display:none;" /> -->
+      style="display:none;" />
+
     <sort-delete-form-item-dialog :visible.sync="formItemVisible"
       :normalList="normalList"
       :advanceList="advanceList"
@@ -101,18 +101,19 @@
 </template>
 
 <script>
+import ClipboardJS from 'clipboard';
+import { saveAs } from 'file-saver';
 import TableCard from './TableCard.vue';
 // import draggable from 'vuedraggable';
-// import ClipboardJS from 'clipboard';
-// import { saveAs } from 'file-saver';
 import SortDeleteFormItemDialog from './SortDeleteFormItemDialog.vue';
 import SortDeleteTableColumnDialog from './SortDeleteTableColumnDialog.vue';
 
-// import {
-//   generatVueCode,
-//   getDataJson,
-//   importVueFile,
-// } from '@/utils/formGenerator';
+import {
+  generatVueCode,
+  getFormJson,
+  getTableJson,
+  importVueFile,
+} from '@/utils/tableGenerator';
 import { saveIdGlobal } from '@/utils/db';
 
 function hasClass(target, key) {
@@ -131,10 +132,6 @@ export default {
     },
   },
   props: {
-    // normalList: {
-    //   type: Array,
-    //   default: () => [],
-    // },
     formProps: {
       type: Object,
       default: () => {},
@@ -162,20 +159,20 @@ export default {
       this.bindFindComponent(e);
       // this.bindRomoveComponent(e);
     });
-    // const clipboard = new ClipboardJS('#copyNode', {
-    //   text: () => {
-    //     const codeStr = this.generateCode(this.copyType);
-    //     this.$notify({
-    //       title: '成功',
-    //       message: '代码已复制到剪切板，可粘贴。',
-    //       type: 'success',
-    //     });
-    //     return codeStr;
-    //   },
-    // });
-    // clipboard.on('error', () => {
-    //   this.$message.error('代码复制失败');
-    // });
+    const clipboard = new ClipboardJS('#copyNode', {
+      text: () => {
+        const codeStr = this.generateCode(this.copyType);
+        this.$notify({
+          title: '成功',
+          message: '代码已复制到剪切板，可粘贴。',
+          type: 'success',
+        });
+        return codeStr;
+      },
+    });
+    clipboard.on('error', () => {
+      this.$message.error('代码复制失败');
+    });
   },
   watch: {
     normalList: {
@@ -454,50 +451,69 @@ export default {
         this.tableColumnVisible = true;
       }
     },
-    // generateCode(generateType) {
-    //   if (generateType === 'json') {
-    //     return getDataJson(this.formSchema, this.formUiSchema, this.formModel);
-    //   }
-    //   return generatVueCode(
-    //     this.formProps,
-    //     this.formSchema,
-    //     this.formUiSchema,
-    //     this.formModel,
-    //   );
-    // },
-    // copyCommand(name) {
-    //   this.copyType = name;
-    //   document.getElementById('copyNode').click();
-    // },
-    // upDownCommand(name) {
-    //   if (name === 'download') {
-    //     this.downloadCode();
-    //   } else {
-    //     document.getElementById('uploader').click();
-    //   }
-    // },
-    // downloadCode() {
-    //   const codeStr = this.generateCode();
-    //   const blob = new Blob([codeStr], { type: 'text/plain;charset=utf-8' });
-    //   saveAs(blob, 'LowCodeForm.vue');
-    // },
-    // async changeFile(e) {
-    //   const loading = this.$loading({
-    //     lock: true,
-    //     text: '渲染中...',
-    //     spinner: 'el-icon-loading',
-    //     background: 'rgba(0, 0, 0, 0.7)',
-    //   });
+    generateCode(generateType) {
+      const { tableSchema, tableUiSchema } = this.$refs.tableCard.getTableSchemaInfo();
+      if (generateType === 'form') {
+        return getFormJson(this.normalSchema,
+          this.normalUiSchema,
+          this.advanceSchema,
+          this.advanceUiSchema,
+          this.formModel);
+      } if (generateType === 'table') {
+        return getTableJson(tableSchema, tableUiSchema);
+      }
 
-    //   const { normalList, formProps } = await importVueFile(e.target);
-    //   this.normalList = normalList;
-    //   this.$emit('changeFormProps', formProps);
-    //   document.getElementById('uploader').value = '';
-    //   setTimeout(() => {
-    //     this.setDefaultComponent();
-    //     loading.close();
-    //   }, 200);
-    // },
+
+      return generatVueCode(
+        this.formProps,
+        this.normalSchema,
+        this.normalUiSchema,
+        this.advanceSchema,
+        this.advanceUiSchema,
+        tableSchema,
+        tableUiSchema,
+        this.formModel,
+      );
+    },
+    copyCommand(name) {
+      this.copyType = name;
+      document.getElementById('copyNode').click();
+    },
+    upDownCommand(name) {
+      if (name === 'download') {
+        this.downloadCode();
+      } else {
+        document.getElementById('uploader').click();
+      }
+    },
+    downloadCode() {
+      const codeStr = this.generateCode();
+      const blob = new Blob([codeStr], { type: 'text/plain;charset=utf-8' });
+      saveAs(blob, 'LowCodeForm.vue');
+    },
+    async changeFile(e) {
+      const loading = this.$loading({
+        lock: true,
+        text: '渲染中...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+      });
+
+      const {
+        normalList, advanceList, tableList, formProps,
+      } = await importVueFile(e.target);
+      debugger;
+      this.normalList = normalList;
+      this.advanceList = advanceList;
+      this.tableList = tableList;
+      this.$emit('changeFormProps', formProps);
+      document.getElementById('uploader').value = '';
+      setTimeout(() => {
+        this.setDefaultComponent();
+        this.setDefaultComponentByTableColumn();
+        loading.close();
+      }, 200);
+    },
   },
 };
 </script>

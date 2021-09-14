@@ -115,15 +115,16 @@ export default {
 
         // properties[key].lcComponentName = item.lcComponentName;
       });
-      //   this.formModel = Object.assign(
-      //     {},
-      //     this.normalFormModel,
-      //     this.advanceFormModel,
-      //   );
       this.schema = {
         properties,
       };
       this.uiSchema = uiSchema;
+    },
+    getTableSchemaInfo() {
+      return {
+        tableSchema: this.schema,
+        tableUiSchema: this.uiSchema,
+      };
     },
     renderProTable() {
       const { schema, uiSchema, tableData } = this;
