@@ -42,7 +42,7 @@
         <el-dropdown @command="clearCommand">
           <el-button type="text"
             icon="el-icon-delete"
-            class="commonBtn">清空</el-button>
+            class="commonBtn dangerText">清空</el-button>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item command="all">清空所有</el-dropdown-item>
             <el-dropdown-item command="normal">清空普通搜索</el-dropdown-item>
