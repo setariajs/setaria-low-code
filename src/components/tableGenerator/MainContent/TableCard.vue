@@ -133,7 +133,7 @@ export default {
           schema={schema}
           uiSchema={uiSchema}
           data={tableData}
-          isShowColumnSetting={false}
+          showColumnSetting={false}
         ></el-pro-table>
       );
     },
