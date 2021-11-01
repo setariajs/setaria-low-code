@@ -126,6 +126,10 @@ export const getDataJson = (formSchema, formUiSchema, formModel) => {
   // eslint-disable-next-line no-useless-escape
     .replace(/\\\"/g, '"');
 
+  // 处理 datePicker.uiSchema.ui:options 整体替换
+  uiSchema = uiSchema.replace(/datePicker.uiSchema.ui:options./g, '');
+
+
   return JsBeautify.js(`
   {
     formSchema:${JSON.stringify(formSchema)},
